@@ -6,6 +6,8 @@ use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
@@ -280,7 +282,94 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
         $this->get(route('catalogo'))
             ->assertOk()
             ->assertSee('Pique Macho')
-            ->assertDontSee('Plato Retirado');
+            ->assertDontSee('Plato Retirado')
+            ->assertSee(asset('img/platos/plato1.jpeg'), false);
+    }
+
+    public function test_el_catalogo_mantiene_los_datos_de_cada_producto_y_un_orden_estable(): void
+    {
+        $primero = $this->producto([
+            'nombre' => 'Z plato',
+            'descripcion' => 'Descripción del primer plato',
+            'imagen' => 'platos/primero.jpg',
+        ]);
+        $segundo = $this->producto([
+            'nombre' => 'A plato',
+            'descripcion' => 'Descripción del segundo plato',
+            'imagen' => 'platos/segundo.jpg',
+        ]);
+
+        $this->get(route('catalogo'))
+            ->assertOk()
+            ->assertSeeInOrder(['Z plato', 'A plato'])
+            ->assertSee('Descripción del primer plato')
+            ->assertSee('Descripción del segundo plato')
+            ->assertSee($primero->imagen_url, false)
+            ->assertSee($segundo->imagen_url, false);
+    }
+
+    public function test_el_panel_guarda_y_actualiza_la_imagen_en_public_img_platos(): void
+    {
+        $rutasImagen = [];
+
+        try {
+            $this->actingAs(User::factory()->administrador()->create())
+                ->post(route('admin.productos.store'), [
+                    'nombre' => 'Plato con imagen',
+                    'descripcion' => 'Imagen de prueba',
+                    'precio' => 25,
+                    'porciones_iniciales' => 10,
+                    'imagen' => UploadedFile::fake()->createWithContent(
+                        'primera.png',
+                        base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWZ8AAAAASUVORK5CYII=')
+                    ),
+                ])
+                ->assertRedirect(route('admin.productos.index'));
+
+            $producto = Producto::where('nombre', 'Plato con imagen')->firstOrFail();
+            $rutaAnterior = $producto->imagen;
+            $rutasImagen[] = $rutaAnterior;
+
+            $this->assertStringStartsWith('img/platos/', $rutaAnterior);
+            $this->assertFileExists(public_path($rutaAnterior));
+            $this->assertSame(asset($rutaAnterior), $producto->imagen_url);
+
+            $this->actingAs(User::factory()->administrador()->create())
+                ->put(route('admin.productos.update', $producto), [
+                    'nombre' => $producto->nombre,
+                    'descripcion' => $producto->descripcion,
+                    'precio' => $producto->precio,
+                    'imagen' => UploadedFile::fake()->createWithContent(
+                        'segunda.png',
+                        base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWZ8AAAAASUVORK5CYII=')
+                    ),
+                ])
+                ->assertRedirect(route('admin.productos.index'));
+
+            $producto->refresh();
+            $rutaNueva = $producto->imagen;
+            $rutasImagen[] = $rutaNueva;
+
+            $this->assertNotSame($rutaAnterior, $rutaNueva);
+            $this->assertFileDoesNotExist(public_path($rutaAnterior));
+            $this->assertFileExists(public_path($rutaNueva));
+            $this->assertSame(asset($rutaNueva), $producto->imagen_url);
+        } finally {
+            foreach (array_unique($rutasImagen) as $ruta) {
+                File::delete(public_path($ruta));
+            }
+        }
+    }
+
+    public function test_el_home_muestra_solo_productos_destacados(): void
+    {
+        $this->producto(['nombre' => 'Especialidad de la casa', 'destacado' => true]);
+        $this->producto(['nombre' => 'Plato del catálogo', 'destacado' => false]);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Especialidad de la casa')
+            ->assertDontSee('Plato del catálogo');
     }
 
 /** Un pedido de delivery, en el estado que se le pase. */

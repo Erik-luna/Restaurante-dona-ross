@@ -61,9 +61,10 @@
         <div class="col-lg-4 col-md-6">
             <div class="card-ross h-100 d-flex flex-column">
                 <div class="position-relative overflow-hidden" style="border-radius: var(--ross-radius) var(--ross-radius) 0 0;">
-                    <img src="{{ $producto->imagen ? asset('storage/'.$producto->imagen) : asset('img/platos/plato' . (($loop->index % 5) + 1) . '.jpeg') }}" 
-                         class="w-100" 
-                         alt="{{ $producto->nombre }}" 
+                    <img src="{{ $producto->imagen_url ?: asset('img/platos/plato1.jpeg') }}"
+                         onerror="this.onerror=null;this.src='{{ asset('img/platos/plato1.jpeg') }}';"
+                         class="w-100"
+                         alt="{{ $producto->nombre }}"
                          style="height: 240px; object-fit: cover; transition: transform 0.4s ease;"
                          onmouseover="this.style.transform='scale(1.06)'"
                          onmouseout="this.style.transform='scale(1)'">
@@ -91,7 +92,7 @@
                     </h4>
                     
                     <p class="card-text text-muted small flex-grow-1 mb-3" style="line-height: 1.5;">
-                        {{ $producto->descripcion ?: 'Delicioso plato tradicional preparado con el auténtico toque casero de Doña Ross.' }}
+                        {{ $producto->descripcion }}
                     </p>
 
                     <div class="d-flex align-items-baseline justify-content-between mb-3">

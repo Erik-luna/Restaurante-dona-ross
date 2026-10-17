@@ -7,8 +7,11 @@ use App\Models\Categoria;
 use App\Models\Producto;
 use App\Models\StockJornada;
 use App\Services\StockService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductoController extends Controller
 {
@@ -36,8 +39,8 @@ class ProductoController extends Controller
     /**
      * Alta de producto.
      *
-     * El nombre del archivo de imagen NUNCA se toma del cliente: `store()`
-     * genera un nombre aleatorio en el servidor. Usar el nombre enviado sería lo
+     * El nombre del archivo de imagen NUNCA se toma del cliente: se genera un
+     * nombre aleatorio en el servidor. Usar el nombre enviado sería lo
      * que permite escribir `../../.env` o sustituir un `.php` del directorio
      * público, y además permitiría subir dos archivos con el mismo nombre y que
      * uno pisara al otro sin aviso.
@@ -45,7 +48,7 @@ class ProductoController extends Controller
     public function store(ProductoRequest $request, StockService $stock)
     {
         $imagen = $request->hasFile('imagen')
-            ? ['imagen' => $request->file('imagen')->store('productos', 'public')]
+            ? ['imagen' => $this->guardarImagen($request->file('imagen'))]
             : [];
 
         // El alta y la carga de porciones de hoy van en la misma transacción: un
@@ -90,16 +93,17 @@ class ProductoController extends Controller
     public function update(ProductoRequest $request, Producto $producto)
     {
         $imagen = [];
+        $imagenAnterior = $producto->imagen;
 
         if ($request->hasFile('imagen')) {
-            if ($producto->imagen) {
-                Storage::disk('public')->delete($producto->imagen);
-            }
-
-            $imagen = ['imagen' => $request->file('imagen')->store('productos', 'public')];
+            $imagen = ['imagen' => $this->guardarImagen($request->file('imagen'))];
         }
 
         $producto->update($request->atributosProducto($imagen));
+
+        if ($imagen && $imagenAnterior) {
+            $this->eliminarImagen($imagenAnterior);
+        }
 
         return redirect()->route('admin.productos.index')->with('success', 'Producto actualizado correctamente.');
     }
@@ -110,11 +114,6 @@ class ProductoController extends Controller
      */
     public function destroy(Producto $producto)
     {
-        if ($producto->imagen) {
-            Storage::disk('public')->delete($producto->imagen);
-            $producto->forceFill(['imagen' => null])->saveQuietly();
-        }
-
         // Se mira en las dos tablas: un producto que sólo se vendió en el salón
         // tampoco puede borrarse, porque sus ventas deben seguir siendo legibles.
         if ($producto->tieneHistorial()) {
@@ -126,8 +125,48 @@ class ProductoController extends Controller
             );
         }
 
+        if ($producto->imagen) {
+            $this->eliminarImagen($producto->imagen);
+        }
+
         $producto->delete();
 
         return redirect()->route('admin.productos.index')->with('success', 'Producto eliminado correctamente.');
+    }
+
+    private function guardarImagen(UploadedFile $imagen): string
+    {
+        $directorio = public_path('img/platos');
+        File::ensureDirectoryExists($directorio);
+
+        $nombre = Str::uuid().'.'.$imagen->extension();
+        $imagen->move($directorio, $nombre);
+
+        return 'img/platos/'.$nombre;
+    }
+
+    private function eliminarImagen(string $imagen): void
+    {
+        if (str_starts_with($imagen, 'img/platos/')) {
+            $nombre = substr($imagen, strlen('img/platos/'));
+
+            if ($nombre !== '' && basename($nombre) === $nombre) {
+                $ruta = public_path('img/platos/'.$nombre);
+
+                if (is_file($ruta) && ! unlink($ruta)) {
+                    throw new \RuntimeException('No se pudo eliminar la imagen del producto.');
+                }
+            }
+
+            return;
+        }
+
+        if (str_starts_with($imagen, 'productos/')) {
+            $nombre = substr($imagen, strlen('productos/'));
+
+            if ($nombre !== '' && basename($nombre) === $nombre) {
+                Storage::disk('public')->delete($imagen);
+            }
+        }
     }
 }

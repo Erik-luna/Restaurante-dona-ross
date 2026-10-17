@@ -40,7 +40,8 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
-                                        <img src="{{ $item['producto']->imagen ? asset('storage/'.$item['producto']->imagen) : asset('img/platos/plato' . (($loop->index % 5) + 1) . '.jpeg') }}" 
+                                        <img src="{{ $item['producto']->imagen_url ?: asset('img/platos/plato1.jpeg') }}"
+                                             onerror="this.onerror=null;this.src='{{ asset('img/platos/plato1.jpeg') }}';"
                                              class="rounded-3 shadow-sm" 
                                              alt="{{ $item['producto']->nombre }}" 
                                              style="width: 60px; height: 60px; object-fit: cover;">
@@ -153,4 +154,3 @@
     @endif
 </div>
 @endsection
-

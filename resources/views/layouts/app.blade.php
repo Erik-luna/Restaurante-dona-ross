@@ -636,12 +636,11 @@
         <div class="footer-bottom">
             <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
                 <span class="text-white-50">&copy; {{ date('Y') }} Restaurante Doña Ross. Todos los derechos reservados.</span>
-                <span class="text-white-50 small">Desarrollado con <i class="bi bi-heart-fill text-danger mx-1"></i> para la mejor experiencia gastronómica.</span>
+                <!--<span class="text-white-50 small">Desarrollado con <i class="bi bi-heart-fill text-danger mx-1"></i> para la mejor experiencia gastronómica.</span>-->
             </div>
         </div>
     </footer>
 
-    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>

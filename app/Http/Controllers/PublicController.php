@@ -9,10 +9,6 @@ use App\Models\Promocion;
 use App\Support\Texto;
 
 /**
- * PÃ¡ginas pÃºblicas del restaurante (puntos 1 y 6).
- *
- * Traza del endpoint mÃ¡s expuesto de la web:
- *
  *   Fuente    -> GET /catalogo?buscar=...&categoria=...
  *                (no requiere autenticaciÃ³n; se invoca desde la URL, desde un
  *                enlace de correo o desde un crawler)
@@ -31,6 +27,7 @@ class PublicController extends Controller
             ->where('destacado', true)
             ->select('productos.*')
             ->selectRaw(Producto::EXPRESION_DISPONIBLE.' as disponible', Producto::rangoDeFecha())
+            ->orderBy('id', 'asc')
             ->take(3)
             ->get();
 
@@ -78,7 +75,7 @@ class PublicController extends Controller
             $query->where('nombre', 'like', Texto::likeSeguro($termino));
         }
 
-        $productos = $query->orderBy('nombre')->paginate(9)->withQueryString();
+        $productos = $query->orderBy('id', 'asc')->paginate(9)->withQueryString();
         $categorias = Categoria::activas()->orderBy('nombre')->get();
 
         return view('catalogo', compact('productos', 'categorias'));

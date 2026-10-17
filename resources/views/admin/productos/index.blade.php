@@ -34,7 +34,8 @@
                     <td class="fw-bold text-muted">{{ $p->id }}</td>
                     <td>
                         <div class="d-flex align-items-center gap-3">
-                            <img src="{{ $p->imagen ? asset('storage/'.$p->imagen) : asset('img/platos/plato' . (($loop->index % 5) + 1) . '.jpeg') }}" 
+                            <img src="{{ $p->imagen_url ?: asset('img/platos/plato1.jpeg') }}"
+                                 onerror="this.onerror=null;this.src='{{ asset('img/platos/plato1.jpeg') }}';"
                                  alt="{{ $p->nombre }}" 
                                  class="rounded-3 shadow-sm" 
                                  style="width: 48px; height: 48px; object-fit: cover;">
@@ -99,4 +100,3 @@
     {{ $productos->links('pagination::bootstrap-5') }}
 </div>
 @endsection
-

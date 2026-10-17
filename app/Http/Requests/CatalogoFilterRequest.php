@@ -5,17 +5,9 @@ namespace App\Http\Requests;
 use App\Support\Reglas;
 use Illuminate\Validation\Rule;
 
-/**
- * Filtros del catálogo público (búsqueda, categoría y orden).
- *
- * El término de búsqueda acaba dentro de una cláusula LIKE, así que hay dos
- * controles: aquí se limita a 100 caracteres, y en el controlador se escapan los
- * comodines con Texto::likeSeguro(). Sin ese escapado, buscar "%" (que es un
- * término perfectamente válido) devolvería el catálogo entero.
- */
+//faltan cambios aqui para mas rato arreglar
 class CatalogoFilterRequest extends BaseRequest
 {
-    /** Valores admitidos en el parámetro de ordenamiento. */
     public const ORDENES = ['recientes', 'precio_asc', 'precio_desc', 'nombre'];
 
     public function authorize(): bool
@@ -52,9 +44,7 @@ class CatalogoFilterRequest extends BaseRequest
         return in_array($orden, self::ORDENES, true) ? $orden : 'recientes';
     }
 
-    /**
-     * Término de búsqueda ya validado, o cadena vacía si no se buscó.
-     */
+    //aquii colocar la seguriadd contra el xss
     public function termino(): string
     {
         $termino = $this->input('buscar');

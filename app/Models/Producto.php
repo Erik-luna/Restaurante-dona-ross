@@ -77,9 +77,34 @@ class Producto extends Model
         if (! $this->imagen) {
             return null;
         }
-        return str_starts_with($this->imagen, 'http')
-            ? $this->imagen
-            : asset('storage/' . $this->imagen);
+
+        if (str_starts_with(strtolower($this->imagen), 'http://') || str_starts_with(strtolower($this->imagen), 'https://')) {
+            return $this->imagen;
+        }
+
+        $ruta = str_replace('\\', '/', ltrim($this->imagen, '/'));
+
+        if (str_starts_with($ruta, 'public/')) {
+            $ruta = substr($ruta, strlen('public/'));
+        }
+
+        if (str_starts_with($ruta, 'storage/')) {
+            return asset($ruta);
+        }
+
+        if (str_starts_with($ruta, 'img/')) {
+            return asset($ruta);
+        }
+
+        if (str_starts_with($ruta, 'productos/')) {
+            return asset('storage/'.$ruta);
+        }
+
+        if (str_starts_with($ruta, 'platos/')) {
+            return asset('img/'.$ruta);
+        }
+
+        return asset('img/platos/'.$ruta);
     }
 
     public function categoria(): BelongsTo

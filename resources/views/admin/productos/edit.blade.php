@@ -64,7 +64,9 @@
                 <input type="file" name="imagen" class="form-control" accept="image/*">
                 @if($producto->imagen)
                     <div class="d-flex align-items-center gap-2 mt-2">
-                        <img src="{{ asset('storage/'.$producto->imagen) }}" class="rounded shadow-sm" width="60" height="60" style="object-fit: cover;">
+                        <img src="{{ $producto->imagen_url ?: asset('img/platos/plato1.jpeg') }}"
+                             onerror="this.onerror=null;this.src='{{ asset('img/platos/plato1.jpeg') }}';"
+                             class="rounded shadow-sm" width="60" height="60" style="object-fit: cover;">
                         <small class="text-muted">Imagen actual</small>
                     </div>
                 @endif
@@ -98,4 +100,3 @@
     </form>
 </div>
 @endsection
-

@@ -34,11 +34,11 @@
                     <input type="password" class="form-control border-start-0 ps-0" name="password" placeholder="••••••••" required style="border-radius: 0 12px 12px 0;">
                 </div>
             </div>
-
+            //cambiar esta parte por otro mejor 
             <div class="mb-4 form-check">
                 <input type="checkbox" class="form-check-input" name="remember" id="remember_admin">
                 <label class="form-check-label text-muted small" for="remember_admin">
-                    Recordar este equipo seguro por 30 días (evita fricción innecesaria)
+                    Recordar este equipo seguro por 30 días
                 </label>
             </div>
 

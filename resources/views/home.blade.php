@@ -112,9 +112,10 @@
         <div class="col-lg-4 col-md-6">
             <div class="card-ross h-100 d-flex flex-column">
                 <div class="position-relative overflow-hidden" style="border-radius: var(--ross-radius) var(--ross-radius) 0 0;">
-                    <img src="{{ $producto->imagen ? asset('storage/'.$producto->imagen) : asset('img/platos/plato' . (($loop->index % 5) + 1) . '.jpeg') }}" 
-                         class="w-100" 
-                         alt="{{ $producto->nombre }}" 
+                    <img src="{{ $producto->imagen_url ?: asset('img/platos/plato1.jpeg') }}"
+                         onerror="this.onerror=null;this.src='{{ asset('img/platos/plato1.jpeg') }}';"
+                         class="w-100"
+                         alt="{{ $producto->nombre }}"
                          style="height: 230px; object-fit: cover; transition: transform 0.4s ease;"
                          onmouseover="this.style.transform='scale(1.06)'"
                          onmouseout="this.style.transform='scale(1)'">
@@ -201,7 +202,7 @@
         </div>
     </div>
 
-    <!-- Quick Info Cards -->
+    <!-- la parte del horrario -->
     <div class="row g-4">
         <div class="col-md-4">
             <div class="card-ross h-100 p-4 d-flex flex-row align-items-center gap-3">
@@ -213,8 +214,7 @@
                     <p class="text-muted small mb-1">
                         {{ $horarioHoy?->nombreDia() }}: {{ $horarioHoy?->rango() ?? 'no configurado' }}
                     </p>
-                    {{-- El indicador sale de los horarios guardados, no está escrito en la
-                         plantilla: antes decía "Abierto ahora" a las cuatro de la mañana. --}}
+                    <!-- Indicador de estado caundo el restaurente habra -->
                     @if($horarioHoy?->estaAbierto())
                         <span class="badge bg-success-subtle text-success small">Abierto ahora</span>
                     @else
@@ -253,4 +253,4 @@
         </div>
     </div>
 </div>
-@endsection
+@endsection
