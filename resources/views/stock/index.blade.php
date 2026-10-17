@@ -116,7 +116,7 @@
         </table>
     </div>
 </div>
-
+<!-- Explicación de la pantalla 
 <div class="card border-0 shadow-sm rounded-4">
     <div class="card-body">
         <h6 class="fw-bold mb-2"><i class="bi bi-info-circle me-1"></i> Cómo se lee esta pantalla</h6>
@@ -128,4 +128,5 @@
         </ul>
     </div>
 </div>
+-->
 @endsection

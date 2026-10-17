@@ -9,7 +9,7 @@
         <h2 class="fw-bold mb-1 font-serif" style="color: var(--ross-primary);">Panel de Ventas del Salón</h2>
         <p class="text-muted small mb-0">Registra ventas presenciales y consulta los pedidos por cobrar.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
         @if($caja)
             <a href="{{ route('cajero.caja.show', $caja) }}" class="btn btn-ross-secondary btn-sm">
                 <i class="bi bi-safe me-1"></i> Mi Caja
@@ -46,7 +46,7 @@
 @endif
 
 <div class="row g-4 mb-4">
-    <div class="col-md-4">
+    <div class="col-12 col-md-6 col-xl-4">
         <div class="card-stat d-flex align-items-center justify-content-between">
             <div>
                 <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Ventas de Hoy</span>
@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-12 col-md-6 col-xl-4">
         <div class="card-stat d-flex align-items-center justify-content-between">
             <div>
                 <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Ventas Registradas</span>
@@ -72,7 +72,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-12 col-md-6 col-xl-4">
         <div class="card-stat d-flex align-items-center justify-content-between">
             <div>
                 <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Pedidos por Cobrar</span>
@@ -94,36 +94,36 @@
     </div>
     <div class="row g-3 p-4 pt-2">
         <div class="col-md-6">
-            <div class="p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between">
+            <div class="p-3 rounded-3 border bg-light d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
                 <div>
                     <h6 class="fw-bold mb-1">Venta en Mostrador / Mesa</h6>
                     <p class="text-muted small mb-0">Registrar un nuevo pedido local o para llevar.</p>
                 </div>
-                <a href="{{ route('cajero.ventas.create') }}" class="btn btn-ross-primary btn-sm px-3">
+                <a href="{{ route('cajero.ventas.create') }}" class="btn btn-ross-primary btn-sm px-3 flex-shrink-0">
                     <i class="bi bi-plus-lg"></i> Iniciar
                 </a>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between">
+            <div class="p-3 rounded-3 border bg-light d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
                 <div>
                     <h6 class="fw-bold mb-1">Consultar Pedidos Online</h6>
                     <p class="text-muted small mb-0">Ver lo que viene de delivery y su estado de cobro.</p>
                 </div>
-                <a href="{{ route('cajero.pedidos.index') }}" class="btn btn-ross-secondary btn-sm px-3">
+                <a href="{{ route('cajero.pedidos.index') }}" class="btn btn-ross-secondary btn-sm px-3 flex-shrink-0">
                     <i class="bi bi-list-check"></i> Ver
                 </a>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="p-3 rounded-3 border bg-light d-flex align-items-center justify-content-between">
+            <div class="p-3 rounded-3 border bg-light d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
                 <div>
                     <h6 class="fw-bold mb-1">{{ $caja ? 'Movimiento de caja' : 'Abrir caja del turno' }}</h6>
                     <p class="text-muted small mb-0">
                         {{ $caja ? 'Entradas y salidas de efectivo que no son ventas.' : 'Registra el monto con el que arrancas.' }}
                     </p>
                 </div>
-                <a href="{{ route('cajero.caja.index') }}" class="btn btn-ross-secondary btn-sm px-3">
+                <a href="{{ route('cajero.caja.index') }}" class="btn btn-ross-secondary btn-sm px-3 flex-shrink-0">
                     <i class="bi bi-safe"></i> Caja
                 </a>
             </div>

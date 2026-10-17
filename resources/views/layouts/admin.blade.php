@@ -73,6 +73,23 @@
             padding: 20px 14px;
             box-shadow: 2px 0 10px rgba(0,0,0,0.08);
         }
+        .admin-sidebar .offcanvas-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .admin-sidebar .offcanvas-body {
+            padding: 20px 14px;
+        }
+        .admin-content {
+            min-width: 0;
+        }
+        .admin-content .table-card {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        .admin-content .table-responsive {
+            max-width: 100%;
+        }
         .sidebar-section-title {
             color: rgba(255, 255, 255, 0.45);
             font-size: 0.7rem;
@@ -230,39 +247,78 @@
             font-size: 0.875rem;
             margin-bottom: 0.35rem;
         }
+
+        @media (max-width: 991.98px) {
+            .admin-sidebar {
+                min-height: 100vh;
+                padding: 0;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .admin-topbar {
+                padding: 8px 12px;
+            }
+            .admin-content {
+                padding: 16px !important;
+            }
+            .card-stat {
+                padding: 16px;
+            }
+            .card-stat > div:first-child {
+                min-width: 0;
+            }
+            .card-stat h3 {
+                overflow-wrap: anywhere;
+            }
+            .card-stat-icon {
+                width: 42px;
+                height: 42px;
+                flex: 0 0 auto;
+                font-size: 1.25rem;
+            }
+        }
     </style>
     @stack('styles')
 </head>
 <body>
     <!-- Topbar -->
     <nav class="admin-topbar">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-                <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('home') }}">
+        <div class="container-fluid d-flex justify-content-between align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 gap-sm-3">
+                <button class="btn btn-outline-secondary d-lg-none p-2"
+                        type="button"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#adminSidebar"
+                        aria-controls="adminSidebar"
+                        aria-label="Abrir menú de navegación">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none flex-shrink-0" href="{{ route('home') }}">
                     <img src="{{ asset('img/logo.jpeg') }}" alt="Logo" class="admin-brand-logo">
-                    <div>
+                    <div class="d-none d-sm-block">
                         <span class="fw-bold font-serif fs-5" style="color: var(--ross-primary);">Doña Ross</span>
-                        <span class="badge bg-secondary-subtle text-dark ms-2 fw-semibold" style="font-size: 0.75rem;">@yield('panel-title', 'Panel')</span>
+                        <span class="badge bg-secondary-subtle text-dark ms-2 fw-semibold d-none d-md-inline" style="font-size: 0.75rem;">@yield('panel-title', 'Panel')</span>
                     </div>
                 </a>
             </div>
 
-            <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center gap-2 px-3 py-1 bg-light rounded-pill border">
+            <div class="d-flex align-items-center gap-1 gap-sm-3">
+                <div class="d-flex align-items-center gap-2 px-2 px-sm-3 py-1 bg-light rounded-pill border">
                     <i class="bi bi-person-circle fs-5" style="color: var(--ross-primary);"></i>
-                    <span class="fw-semibold small text-dark">{{ auth()->user()->name }}</span>
-                    <span class="badge rounded-pill text-uppercase px-2" style="background: var(--ross-gold); color: #5A0B0D; font-size: 0.68rem;">
+                    <span class="fw-semibold small text-dark d-none d-sm-inline">{{ auth()->user()->name }}</span>
+                    <span class="badge rounded-pill text-uppercase px-2 d-none d-md-inline" style="background: var(--ross-gold); color: #5A0B0D; font-size: 0.68rem;">
                         {{ auth()->user()->role }}
                     </span>
                 </div>
 
-                <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" target="_blank" title="Abrir sitio web público">
+                <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-2 px-sm-3" target="_blank" title="Abrir sitio web público">
                     <i class="bi bi-box-arrow-up-right me-1"></i> <span class="d-none d-md-inline">Ver Sitio</span>
                 </a>
 
                 <form action="{{ route('logout') }}" method="POST" class="d-inline m-0">
                     @csrf
-                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3" title="Cerrar sesión">
+                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-2 px-sm-3" title="Cerrar sesión">
                         <i class="bi bi-box-arrow-right me-1"></i> <span class="d-none d-md-inline">Salir</span>
                     </button>
                 </form>
@@ -274,15 +330,25 @@
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar Col -->
-            <div class="col-md-3 col-lg-2 admin-sidebar">
-                @yield('sidebar')
+            <div class="col-lg-2 admin-sidebar offcanvas-lg offcanvas-start"
+                 tabindex="-1"
+                 id="adminSidebar"
+                 aria-labelledby="adminSidebarLabel"
+                 style="--bs-offcanvas-width: min(85vw, 280px);">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title text-white fw-bold" id="adminSidebarLabel">@yield('panel-title', 'Panel')</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar menú"></button>
+                </div>
+                <div class="offcanvas-body">
+                    @yield('sidebar')
+                </div>
             </div>
 
             <!-- Content Col -->
-            <div class="col-md-9 col-lg-10 p-4 p-md-5">
+            <main class="col-12 col-lg-10 admin-content p-3 p-md-4 p-xl-5">
                 @include('partials.alerts')
                 @yield('content')
-            </div>
+            </main>
         </div>
     </div>
 
@@ -291,4 +357,3 @@
     @stack('scripts')
 </body>
 </html>
-

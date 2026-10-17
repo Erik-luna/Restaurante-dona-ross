@@ -9,7 +9,7 @@
         <h2 class="fw-bold mb-1 font-serif" style="color: var(--ross-primary);">Panel de Administración</h2>
         <p class="text-muted small mb-0">Resumen operativo general, ventas y pedidos del restaurante.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
         <a href="{{ route('admin.productos.create') }}" class="btn btn-ross-primary btn-sm">
             <i class="bi bi-plus-lg"></i> Nuevo Producto
         </a>

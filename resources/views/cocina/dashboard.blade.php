@@ -9,7 +9,7 @@
         <h2 class="fw-bold mb-1 font-serif" style="color: var(--ross-primary);">Pedidos de Cocina</h2>
         <p class="text-muted small mb-0">Marcá cada pedido como se vaya preparando y controlá las porciones del día.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
         <a href="{{ route('cocina.stock.index') }}" class="btn btn-ross-secondary btn-sm">
             <i class="bi bi-boxes me-1"></i> Porciones
         </a>
@@ -17,7 +17,7 @@
 </div>
 
 <div class="row g-4 mb-4">
-    <div class="col-md-3 col-6">
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="card-stat d-flex align-items-center justify-content-between">
             <div>
                 <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Por Preparar</span>
@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <div class="col-md-3 col-6">
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="card-stat d-flex align-items-center justify-content-between">
             <div>
                 <span class="text-muted small fw-semibold text-uppercase d-block mb-1">En Cocina</span>
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div class="col-md-3 col-6">
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="card-stat d-flex align-items-center justify-content-between">
             <div>
                 <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Listos</span>
@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    <div class="col-md-3 col-6">
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="card-stat d-flex align-items-center justify-content-between">
             <div>
                 <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Stock Bajo</span>
