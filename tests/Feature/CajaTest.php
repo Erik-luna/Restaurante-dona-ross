@@ -12,16 +12,6 @@ use App\Models\Venta;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * Pruebas del módulo de caja.
- *
- * La caja es la parte del sistema donde un error se nota en el bolsillo: si una
- * venta entra sin caja, o si el arqueo " cuadra" porque el sistema cambió el número
- * por el que le dio, el descuadre aparece en el dinero real. Por eso las pruebas
- * se centran en tres cosas: que no se pueda vender ni cobrar sin caja, que el
- * arqueo calcule lo que debe calcular, y que un cierre no se pueda repetir ni
- * reescribir.
- */
 class CajaTest extends TestCase
 {
     use RefreshDatabase;
@@ -44,12 +34,9 @@ class CajaTest extends TestCase
 
     private function producto(float $precio = 50.00, int $stock = 20): Producto
     {
-        // El stock va en la jornada de hoy, no en el producto: es crearProducto()
-        // del TestCase base quien abre esa jornada.
         return $this->crearProducto($stock, ['precio' => $precio]);
     }
 
-    /** Pedido de delivery entregado y sin cobrar: el caso típico del cobro. */
     private function pedidoEntregado(float $total = 80.00): Pedido
     {
         $cliente = User::factory()->create(['role' => User::ROL_CLIENTE]);
@@ -63,12 +50,6 @@ class CajaTest extends TestCase
         ]);
     }
 
-    /**
-     * Venta de salón ya cobrada en una caja concreta.
-     *
-     * Es una entidad propia (tabla `ventas`), no un pedido con tipo 'local': por eso
-     * se crea directamente y no por el formulario.
-     */
     private function ventaEnCaja(Caja $caja, float $total = 50.00): Venta
     {
         $cliente = User::factory()->create(['role' => User::ROL_CLIENTE]);
@@ -85,12 +66,6 @@ class CajaTest extends TestCase
         ]);
     }
 
-// ---------------------------------------------------------------- apertura
-
-    /**
-     * La caja de la prueba se consulta con sole() en vez de por un id fijo: el id
-     * depende del orden en que corran las pruebas dentro del archivo.
-     */
     public function test_el_cajero_abre_su_caja_con_el_monto_inicial(): void
     {
         $cajero = $this->cajero();
@@ -121,11 +96,6 @@ class CajaTest extends TestCase
 
         $this->assertSame(1, Caja::count());
     }
-
-/**
-     * Cerrar la caja y abrir otra el mismo día sí se permite: el turno puede partirse
-     * en dos, y cada mitad lleva su propio arqueo.
-     */
     public function test_despues_de_cerrar_se_puede_abrir_otra_caja_el_mismo_dia(): void
     {
         $cajero = $this->cajero();
@@ -150,8 +120,6 @@ class CajaTest extends TestCase
         $this->actingAs($uno)->post(route('cajero.caja.store'), ['monto_inicial' => 100])->assertRedirect();
         $this->actingAs($otro)->post(route('cajero.caja.store'), ['monto_inicial' => 200])->assertRedirect();
 
-        // Cada turno responde por su propio dinero: por eso el índice único es
-        // (user_id, fecha) y no sólo fecha.
         $this->assertSame(2, Caja::count());
     }
 
@@ -169,8 +137,6 @@ class CajaTest extends TestCase
 
         $this->assertSame(0, Caja::count());
     }
-
-    // ------------------------------------------------------------------ ventas
 
     public function test_no_se_registra_una_venta_sin_caja_abierta(): void
     {
@@ -202,24 +168,16 @@ class CajaTest extends TestCase
                 'monto_recibido' => 100.00,
             ])
             ->assertRedirect(route('cajero.ventas.index'));
-
-        // La venta de salón vive en su propia tabla, no en `pedidos`.
         $venta = Venta::sole();
         $this->assertSame(0, Pedido::count());
-
         $this->assertSame($caja->id, $venta->caja_id);
         $this->assertTrue($venta->estaPagada());
-        // 2 x 35 = 70. El cliente entregó 100, el cambio son 30.
         $this->assertSame('70.00', $venta->total);
         $this->assertSame('100.00', $venta->monto_recibido);
         $this->assertSame('30.00', $venta->cambio);
-
-        // Sus líneas van también en su propia tabla.
         $this->assertSame(1, $venta->items()->count());
         $this->assertSame(2, $venta->items()->sole()->cantidad);
         $this->assertSame('35.00', $venta->items()->sole()->precio_unitario);
-
-        // Y el stock se descontó de la jornada de hoy: 20 cargadas menos 2 vendidas.
         $this->assertSame(18, $producto->disponibleEn());
         $this->assertSame(2, StockJornada::de($producto->id)->consumidos);
     }
@@ -240,14 +198,9 @@ class CajaTest extends TestCase
             ->assertSessionHas('error');
 
         $this->assertSame(0, Venta::count());
-
-        // La venta no se guardó, así que tampoco debe haber salido stock: la
-        // comprobación y el descuento tienen que ser la misma operación.
         $this->assertSame(20, $producto->disponibleEn());
         $this->assertSame(0, StockJornada::de($producto->id)->consumidos);
     }
-
-    // -------------------------------------------------------------------- cobro
 
     public function test_el_cobro_de_delivery_calcula_el_cambio_en_el_servidor(): void
     {
@@ -267,18 +220,8 @@ class CajaTest extends TestCase
         $this->assertSame($caja->id, $pedido->caja_id);
         $this->assertTrue($pedido->estaCobrado());
         $this->assertSame('20.00', $pedido->cambio);
-
-        // El dinero del cobro cuenta para el arqueo.
         $this->assertSame(180.00, $caja->resumen()['esperado']);
     }
-
-    /**
-     * El cambio nunca se recibe del formulario.
-     *
-     * Si el navegador mandara su propio campo 'cambio', bastaría con escribir un
-     * número alto para que el sistemaPagara de más. Se mandan campos que el
-     * modelo ni tiene y aun así el cambio se calcula solo.
-     */
     public function test_el_cambio_se_ignora_si_via_en_el_formulario(): void
     {
         $cajero = $this->cajero();
@@ -358,23 +301,14 @@ class CajaTest extends TestCase
 
         $this->assertFalse($pedido->fresh()->estaCobrado());
     }
-
-    // --------------------------------------------------------------- arqueo
-
-    /**
-     * El arqueo suma las ventas de salón y los cobros de delivery por separado, y
-     * descuenta las salidas.
-     */
     public function test_el_arqueo_suma_ventas_cobros_movimientos_y_descuenta_salidas(): void
     {
         $cajero = $this->cajero();
         $caja = $this->abrirCaja($cajero, 100.00);
 
-        // Dos ventas de salón por 60.
         $this->ventaEnCaja($caja, 60.00);
         $this->ventaEnCaja($caja, 60.00);
 
-        // Y un cobro de delivery por 80: dinero real, pero de otra operación.
         $cobro = $this->pedidoEntregado(80.00);
         $cobro->update(['caja_id' => $caja->id, 'pagado_at' => now()]);
 
@@ -393,14 +327,12 @@ class CajaTest extends TestCase
 
         $resumen = $caja->fresh()->resumen();
 
-        // Las dos fuentes de dinero se informan por separado y suman 200.
         $this->assertSame(120.00, $resumen['ventas']);
         $this->assertSame(80.00, $resumen['cobros']);
         $this->assertSame(200.00, $resumen['ingresos']);
         $this->assertSame(30.00, $resumen['entradas']);
         $this->assertSame(25.00, $resumen['salidas']);
 
-        // 100 inicial + 120 ventas + 80 cobros + 30 entrada - 25 salida
         $this->assertSame(305.00, $resumen['esperado']);
     }
 
@@ -408,25 +340,17 @@ class CajaTest extends TestCase
     {
         $cajero = $this->cajero();
         $caja = $this->abrirCaja($cajero, 100.00);
-
-        // Cocinado pero todavía no cobrado: su dinero aún no está en el cajón.
         $sinCobrar = $this->pedidoEntregado(70.00);
         $sinCobrar->update(['caja_id' => $caja->id]);
-
-        // Cobrado y luego cancelado: el dinero se devolvió.
         $cancelado = $this->pedidoEntregado(90.00);
         $cancelado->update([
             'caja_id' => $caja->id,
             'pagado_at' => now(),
             'estado' => Pedido::ESTADO_CANCELADO,
         ]);
-
-        // Una venta anulada tampoco cuenta: se preparó el plato pero no se cobró.
         $anulada = $this->ventaEnCaja($caja, 45.00);
         $anulada->update(['estado' => Venta::ANULADA]);
-
         $resumen = $caja->fresh()->resumen();
-
         $this->assertSame(0.0, $resumen['ventas']);
         $this->assertSame(0.0, $resumen['cobros']);
         $this->assertSame(100.00, $resumen['esperado']);
@@ -438,8 +362,6 @@ class CajaTest extends TestCase
         $otro = $this->cajero();
         $caja = $this->abrirCaja($cajero, 100.00);
 
-        // Ni siquiera ve el formulario: la caja de otro cajero no le pertenece, y
-        // el administrador es quien puede revisarla.
         $this->actingAs($otro)
             ->get(route('cajero.caja.movimiento.create', $caja))
             ->assertForbidden();
@@ -455,8 +377,6 @@ class CajaTest extends TestCase
         $this->assertSame(0, CajaMovimiento::count());
     }
 
-    // ---------------------------------------------------------------- cierre
-
     public function test_el_cierre_guarda_el_arqueo_y_detecta_el_descuadre(): void
     {
         $cajero = $this->cajero();
@@ -464,8 +384,6 @@ class CajaTest extends TestCase
 
         $pedido = $this->pedidoEntregado(60.00);
         $pedido->update(['caja_id' => $caja->id, 'pagado_at' => now()]);
-
-        // El sistema espera 100 + 60 = 160, pero en el cajón hay 155.
         $this->actingAs($cajero)
             ->post(route('cajero.caja.cierre.store', $caja), ['total_declarado' => 155.00])
             ->assertRedirect(route('cajero.caja.show', $caja))
@@ -479,9 +397,6 @@ class CajaTest extends TestCase
         $this->assertSame('-5.00', $caja->diferencia);
         $this->assertFalse($caja->cuadra());
         $this->assertNotNull($caja->cierre_at);
-
-        // El cobro de delivery queda guardado aparte de las ventas, para que un
-        // descuadre se pueda rastrear hasta su origen.
         $this->assertSame('0.00', $caja->total_ventas);
         $this->assertSame('60.00', $caja->total_cobros);
     }
@@ -493,8 +408,6 @@ class CajaTest extends TestCase
 
         $pedido = $this->pedidoEntregado(60.00);
         $pedido->update(['caja_id' => $caja->id, 'pagado_at' => now()]);
-
-        // El sistema espera 100 + 60 = 160, pero en el cajón hay 155.
         $this->actingAs($cajero)
             ->post(route('cajero.caja.cierre.store', $caja), ['total_declarado' => 160.00])
             ->assertSessionHas('success')
@@ -522,7 +435,6 @@ class CajaTest extends TestCase
 
         $this->assertSame(0, CajaMovimiento::count());
 
-        // Y el registro de venta también se rechaza, porque no hay caja abierta.
         $this->actingAs($cajero)
             ->post(route('cajero.ventas.store'), [
                 'user_id' => User::factory()->create(['role' => User::ROL_CLIENTE])->id,
@@ -545,7 +457,6 @@ class CajaTest extends TestCase
             ->post(route('cajero.caja.cierre.store', $caja->fresh(), ['total_declarado' => 500.00]))
             ->assertSessionHasErrors('total_declarado');
 
-        // El primer cierre manda: no se puede reescribir un arqueo ya cerrado.
         $this->assertSame('100.00', $caja->fresh()->total_declarado);
     }
 
@@ -557,7 +468,6 @@ class CajaTest extends TestCase
         $this->actingAs($cajero)
             ->post(route('cajero.caja.cierre.store', $caja), ['total_declarado' => 100.00]);
 
-        // Se abre una caja nueva y se cobra allí el pedido pendiente.
         $cajaVieja = $caja->fresh();
         $this->abrirCaja($cajero, 0.00);
 
@@ -565,13 +475,9 @@ class CajaTest extends TestCase
         $this->actingAs($cajero)
             ->post(route('cajero.caja.cobrar', $pedido), ['metodo_pago' => Pedido::PAGO_QR]);
 
-        // La caja cerrada conserva su número aunque el total del pedido haya
-        // cambiado: su arqueo es una foto histórica.
         $this->assertEqualsWithDelta(100.00, $cajaVieja->arqueo()['esperado'], 0.001);
         $this->assertNotSame($cajaVieja->id, $pedido->fresh()->caja_id);
     }
-
-    // -------------------------------------------------------------- visibilidad
 
     public function test_el_cajero_solo_ve_sus_cajas_y_el_administrador_ve_todas(): void
     {
@@ -579,18 +485,12 @@ class CajaTest extends TestCase
         $otro = $this->cajero();
         $propia = $this->abrirCaja($cajero, 100.00);
         $ajena = $this->abrirCaja($otro, 200.00);
-
-        // El cajero ve la suya...
         $this->actingAs($cajero)
             ->get(route('cajero.caja.show', $propia))
             ->assertOk();
-
-        // ...pero no la del compañero.
         $this->actingAs($cajero)
             ->get(route('cajero.caja.show', $ajena))
             ->assertForbidden();
-
-        // El administrador ve las dos.
         $this->actingAs(User::factory()->administrador()->create())
             ->get(route('admin.caja.show', $propia))
             ->assertOk();
@@ -614,11 +514,6 @@ class CajaTest extends TestCase
         $this->assertCount(1, $cajas);
         $this->assertSame($cajero->id, $cajas->first()->user_id);
     }
-
-    /**
-     * Comprueba un fragmento sin tildes: segun como se codifique la respuesta,
-     * buscar la palabra acentuada daria falsos negativos.
-     */
     public function test_el_dashboard_del_cajero_avisa_que_no_abrio_caja(): void
     {
         $this->actingAs($this->cajero())

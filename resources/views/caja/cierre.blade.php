@@ -14,7 +14,7 @@
 </div>
 
 <div class="row g-4">
-    {{-- Lado izquierdo: lo que el sistema calculó. --}}
+
     <div class="col-lg-6">
         <div class="table-card">
             <h5 class="fw-bold font-serif mb-3" style="color: var(--ross-primary);">
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    {{-- Lado derecho: el conteo de la persona. --}}
+
     <div class="col-lg-6">
         <div class="table-card">
             <h5 class="fw-bold font-serif mb-3" style="color: var(--ross-primary);">

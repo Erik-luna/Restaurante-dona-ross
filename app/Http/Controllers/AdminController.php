@@ -7,9 +7,6 @@ use App\Models\Producto;
 use App\Models\User;
 use App\Models\Venta;
 
-/**
- * Panel del administrador.
- */
 class AdminController extends Controller
 {
     public function dashboard()
@@ -20,10 +17,6 @@ class AdminController extends Controller
             'cajeros' => User::where('role', User::ROL_CAJERO)->count(),
             'cocina' => User::where('role', User::ROL_COCINA)->count(),
             'pedidos_hoy' => Pedido::whereDate('created_at', today())->count(),
-            // 'ventas_hoy' son las ventas de salón. Los pedidos de delivery se
-            // cuentan aparte ('pedidos_hoy'): una venta y un pedido son dos
-            // operaciones distintas y sumarlas en un único número de ingresos
-            // mezclaría dinero cobrado con dinero por cobrar.
             'ventas_hoy' => Venta::whereDate('created_at', today())->sum('total'),
             'pedidos_pendientes' => Pedido::where('estado', Pedido::ESTADO_PENDIENTE)->count(),
         ];

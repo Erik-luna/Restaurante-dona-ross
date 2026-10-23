@@ -11,13 +11,6 @@ use App\Models\VentaItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * El detalle de caja tiene que pintarse con datos de las dos fuentes de dinero.
- *
- * El arqueo se calculó bien en las pruebas del módulo, pero si la vista mezclara
- * los dos listados o pidiera una columna que ya no existe, el error sale en
- * pantalla y no en el test: por eso se renderizan las pantallas con datos reales.
- */
 class CajaPantallaTest extends TestCase
 {
     use RefreshDatabase;
@@ -26,10 +19,6 @@ class CajaPantallaTest extends TestCase
     {
         $cajero = User::factory()->cajero()->create();
         $cliente = User::factory()->create(['role' => User::ROL_CLIENTE]);
-        // Estas pruebas escriben ventas y pedidos con los modelos para poder poner en
-        // la pantalla cualquier cifra, así que no pasan por StockService. Por eso el
-        // producto va sin jornada: el día que alguna venda de verdad, stock
-        // --consumidos = 0 le daría error por falta de existencias.
         $producto = Producto::create([
             'nombre' => 'Silpancho',
             'descripcion' => 'Plato de la casa',
@@ -37,7 +26,6 @@ class CajaPantallaTest extends TestCase
             'activo' => true,
             'destacado' => false,
         ]);
-
         $caja = Caja::create([
             'user_id' => $cajero->id,
             'fecha' => today(),
@@ -45,7 +33,6 @@ class CajaPantallaTest extends TestCase
             'estado' => Caja::ABIERTA,
             'apertura_at' => now(),
         ]);
-
         $venta = Venta::create([
             'user_id' => $cliente->id,
             'caja_id' => $caja->id,
@@ -56,7 +43,6 @@ class CajaPantallaTest extends TestCase
             'cambio' => 30.00,
             'atendido_por' => $cajero->id,
         ]);
-
         VentaItem::create([
             'venta_id' => $venta->id,
             'producto_id' => $producto->id,
@@ -81,10 +67,8 @@ class CajaPantallaTest extends TestCase
             ->assertOk()
             ->assertSee('Ventas de salón')
             ->assertSee('Cobros de pedidos delivery')
-            // Los dos importes aparecen por separado en sus tarjetas.
             ->assertSee('Bs. 70.00')
             ->assertSee('Bs. 80.00')
-            // Y las dos tablas listan su operación.
             ->assertSee('#'.$venta->id)
             ->assertSee('#'.$pedido->id);
     }
@@ -147,7 +131,6 @@ class CajaPantallaTest extends TestCase
             'pagado_at' => now(),
         ]);
 
-        // El cajero tiene que ver de dónde sale el número antes de contar el dinero.
         $this->actingAs($cajero)
             ->get(route('cajero.caja.cierre', $caja))
             ->assertOk()
@@ -160,10 +143,6 @@ class CajaPantallaTest extends TestCase
     {
         $cajero = User::factory()->cajero()->create();
         $cliente = User::factory()->create(['role' => User::ROL_CLIENTE]);
-        // Estas pruebas escriben ventas y pedidos con los modelos para poder poner en
-        // la pantalla cualquier cifra, así que no pasan por StockService. Por eso el
-        // producto va sin jornada: el día que alguna venda de verdad, stock
-        // --consumidos = 0 le daría error por falta de existencias.
         $producto = Producto::create([
             'nombre' => 'Silpancho',
             'descripcion' => 'Plato de la casa',
@@ -208,8 +187,6 @@ class CajaPantallaTest extends TestCase
 
     public function test_una_venta_sin_caja_no_revienta_el_ticket(): void
     {
-        // Las ventas anteriores a este módulo no tienen caja. La ficha tiene que
-        // decirlo con claridad en vez de fallar al buscar la relación.
         $cajero = User::factory()->cajero()->create();
 
         $venta = Venta::create([

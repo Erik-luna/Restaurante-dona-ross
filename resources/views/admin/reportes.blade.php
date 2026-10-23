@@ -17,9 +17,9 @@
     </span>
 </div>
 
-{{-- Tarjetas de resumen. Salón y delivery van separados a propósito: son dinero de
-     dos operaciones distintas y un único "total" dejaría cualquier descuadre sin
-     explicación. --}}
+
+
+
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
         <div class="card-ross p-3 h-100">
@@ -65,8 +65,8 @@
 </div>
 
 <div class="row g-3 mb-4">
-    {{-- Diario: dos series apiladas, porque el total solo no permite ver si el día
-         flojo fue por salón o por delivery. --}}
+
+
     <div class="col-xl-8">
         <div class="card-ross p-4 h-100">
             <h5 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">
@@ -195,26 +195,14 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-    // Los datos se inyectan como JSON y no escritos a mano en el HTML. Hoy solo viajan
-    // aquí fechas e importes, pero el escapado (`<` pasa a \u003C) evita que cualquier
-    // texto que se sume a una etiqueta en el futuro --un nombre, una nota-- pueda
-    // cerrar la etiqueta <script> y ejecutar código en el panel.
     @php
         $json = fn ($valor) => json_encode($valor, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
-
-        // Las etiquetas de los ejes se arman aquí y no en JavaScript: lo que va
-        // dentro de `{!! !!}` lo ejecuta PHP al renderizar, así que una función de
-        // JS llamada desde esa expresión es un error que solo aparece en el
-        // navegador, con la pantalla ya en blanco.
         $mesesCortos = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
         $etiquetaMes = fn (string $mes) => $mesesCortos[(int) substr($mes, 5, 2) - 1].' '.substr($mes, 0, 4);
     @endphp
 
     const primario = getComputedStyle(document.documentElement).getPropertyValue('--ross-primary').trim() || '#8B1E3F';
     const secundario = '#28a745';
-
-    // Si Chart.js no cargó (sin internet), la pantalla sigue siendo legible: las
-    // tablas de abajo no dependen de él. Solo se avisa de que faltan los gráficos.
     if (typeof Chart === 'undefined') {
         document.querySelectorAll('canvas').forEach((lienzo) => {
             lienzo.closest('.card-ross').querySelector('h5').insertAdjacentHTML(
@@ -225,9 +213,6 @@
     } else {
         Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
         Chart.defaults.color = '#6c757d';
-
-        // Un gráfico siempre arranca en y=0: si el eje ajusta su mínimo al menor dato
-        // que encontró, la diferencia entre un buen día y uno malo se ve enorme.
         const opcionesComunes = {
             responsive: true,
             maintainAspectRatio: false,

@@ -11,14 +11,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
-/**
- * Pruebas de los controles de acceso del sistema.
- *
- * Cada rol tiene su propio panel y sus propios permisos, así que aquí se
- * comprueba lo importante: que un rol no pueda saltarse a la sección de otro, y
- * que sí pueda usar la suya. También se comprueba la propiedad de los datos de
- * un cliente y las cabeceras de seguridad.
- */
 class ControlAccesoTest extends TestCase
 {
     use RefreshDatabase;
@@ -28,7 +20,6 @@ class ControlAccesoTest extends TestCase
         return $this->crearProducto(20, $atributos);
     }
 
-    /** Sin sesión no se entra a ningún panel: se redirige al formulario de acceso. */
     public function test_sin_sesion_las_rutas_de_los_paneles_redirigen_al_login(): void
     {
         $this->get(route('admin.dashboard'))->assertRedirect(route('login.cliente'));
@@ -37,9 +28,6 @@ class ControlAccesoTest extends TestCase
         $this->get(route('cliente.dashboard'))->assertRedirect(route('login.cliente'));
     }
 
-    /**
-     * Cada rol entra a su propio panel.
-     */
     public function test_cada_rol_entra_a_su_propio_panel(): void
     {
         $this->actingAs(User::factory()->administrador()->create())
@@ -55,37 +43,19 @@ class ControlAccesoTest extends TestCase
             ->get(route('cliente.dashboard'))->assertOk();
     }
 
-    /**
-     * Un rol no puede entrar en el panel de otro.
-     *
-     * Esta es la prueba que justifica el middleware 'role': sin él, con sólo
-     * comprobar que haya sesión, un cajero podría abrir el catálogo y cambiar
-     * precios escribiendo la URL a mano.
-     */
     public function test_un_rol_no_puede_entrar_en_el_panel_de_otro(): void
     {
         $cajero = User::factory()->cajero()->create();
         $cocina = User::factory()->cocina()->create();
         $cliente = User::factory()->create(['role' => User::ROL_CLIENTE]);
 
-        // El cajero no edita el catálogo (sólo el administrador).
         $this->actingAs($cajero)->get(route('admin.dashboard'))->assertForbidden();
         $this->actingAs($cajero)->get(route('admin.productos.index'))->assertForbidden();
-
-        // La cocina no cobra en el salón.
         $this->actingAs($cocina)->get(route('cocina.dashboard'))->assertOk();
         $this->actingAs($cocina)->get(route('cajero.ventas.index'))->assertForbidden();
-
-        // El cliente no toca ningún panel del restaurante.
         $this->actingAs($cliente)->get(route('admin.dashboard'))->assertForbidden();
         $this->actingAs($cliente)->get(route('cocina.dashboard'))->assertForbidden();
     }
-
-    /**
-     * El cajero consulta los pedidos, pero no tiene con qué moverlos: la ruta para
-     * cambiar el estado directamente no existe para su panel, así que no hay forma
-     * de llegar a la operación ni cambiando la URL.
-     */
     public function test_el_cajero_consulta_pedidos_pero_no_cambia_su_estado(): void
     {
         $cajero = User::factory()->cajero()->create();
@@ -96,14 +66,8 @@ class ControlAccesoTest extends TestCase
             Route::has('cajero.pedidos.estado'),
             'El cajero no debe tener ruta para cambiar el estado de un pedido.'
         );
-
-        // La misma operación sí existe para quien puede hacerla: la cocina.
         $this->assertTrue(Route::has('cocina.pedidos.estado'));
     }
-
-    /**
-     * La cocina mueve el estado de los pedidos y ajusta las porciones.
-     */
     public function test_la_cocina_cambia_el_estado_y_el_stock(): void
     {
         $cocina = User::factory()->cocina()->create();
@@ -116,14 +80,6 @@ class ControlAccesoTest extends TestCase
         $respuesta->assertRedirect();
         $respuesta->assertSessionHasNoErrors();
     }
-
-/**
- * El menú lateral de cada panel corresponde a su rol.
- *
- * Estas vistas (pedidos, stock y ventas) las comparten varios paneles. Si una de
- * ellas incluyera el menú del administrador, la cocina vería enlaces a secciones
- * que no puede abrir: la vista no fallaría, pero el menú sería una promesa falsa.
- */
 public function test_el_menu_lateral_corresponde_al_panel(): void
 {
     $cocina = User::factory()->cocina()->create();
@@ -140,10 +96,6 @@ public function test_el_menu_lateral_corresponde_al_panel(): void
         ->assertDontSee(route('cocina.stock.index'));
 }
 
-/**
- * La cocina no edita el catálogo: las porciones se ajustan sobre el stock que
- * el administrador ya definió.
- */
 public function test_la_cocina_no_gestiona_el_catalogo(): void
 {
     $this->actingAs(User::factory()->cocina()->create())
@@ -151,13 +103,6 @@ public function test_la_cocina_no_gestiona_el_catalogo(): void
         ->assertForbidden();
 }
 
-/**
- * La cola de la cocina pone primero lo que aún no se empezó a preparar.
- *
- * La ordenación se hace con un CASE en la consulta, así que esta prueba verifica
- * además que ese SQL funcione: un error aquí dejaría la cocina preparando los
- * pedidos en orden inverso al que entraron.
- */
 public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
 {
     $cocina = User::factory()->cocina()->create();
@@ -169,21 +114,15 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
         ->get(route('cocina.dashboard'))
         ->assertOk()
         ->viewData('pedidos');
-
-    // 'pendiente' es prioridad 1 y 'confirmado' es prioridad 3.
     $this->assertSame($nuevo->id, $pedidos->first()->id);
     $this->assertSame($listo->id, $pedidos->last()->id);
 }
-
-    /** El administrador tiene acceso a todo lo suyo. */
     public function test_el_administrador_gestiona_las_cuentas_del_restaurante(): void
     {
         $this->actingAs(User::factory()->administrador()->create())
             ->get(route('admin.usuarios.index'))
             ->assertOk();
     }
-
-    /** Un cliente sólo ve sus propios pedidos. */
     public function test_un_cliente_no_puede_ver_el_pedido_de_otro(): void
     {
         $dueño = User::factory()->create(['role' => User::ROL_CLIENTE]);
@@ -195,8 +134,6 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
             ->get(route('cliente.pedidos.show', $pedido))
             ->assertForbidden();
     }
-
-    /** Cada cliente ve el detalle de su propio pedido. */
     public function test_un_cliente_si_puede_ver_su_pedido(): void
     {
         $cliente = User::factory()->create(['role' => User::ROL_CLIENTE]);
@@ -208,8 +145,6 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
             ->get(route('cliente.pedidos.show', $pedido))
             ->assertOk();
     }
-
-    /** El registro público siempre asigna el rol 'cliente', ignora lo que se envíe. */
     public function test_el_registro_siempre_crea_un_cliente(): void
     {
         $this->post(route('register.post'), [
@@ -225,11 +160,6 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
             'role' => User::ROL_CLIENTE,
         ]);
     }
-
-    /**
-     * El login del personal acepta los tres roles del restaurante y deja fuera a
-     * los clientes.
-     */
     public function test_el_login_del_personal_solo_deja_entrar_a_los_empleados(): void
     {
         foreach ([User::ROL_ADMINISTRADOR, User::ROL_CAJERO, User::ROL_COCINA] as $rol) {
@@ -246,8 +176,6 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
             'remember' => false,
         ])->assertSessionHasErrors('email');
     }
-
-    /** Cada rol es enviado a su panel tras iniciar sesión. */
     public function test_cada_rol_es_enviado_a_su_panel(): void
     {
         $cocina = User::factory()->cocina()->create();
@@ -262,8 +190,6 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
 
         $this->assertSame(route('cliente.dashboard'), $cliente->rutaPanel());
     }
-
-    /** Las cabeceras de seguridad están en todas las respuestas. */
     public function test_las_respuestas_incluyen_las_cabeceras_de_seguridad(): void
     {
         $respuesta = $this->get(route('home'));
@@ -272,8 +198,6 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
         $respuesta->assertHeader('X-Content-Type-Options', 'nosniff');
         $respuesta->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     }
-
-    /** El catálogo muestra sólo los productos activos. */
     public function test_el_catalogo_publico_solo_muestra_productos_activos(): void
     {
         $this->producto(['nombre' => 'Pique Macho', 'activo' => true]);
@@ -372,7 +296,6 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
             ->assertDontSee('Plato del catálogo');
     }
 
-/** Un pedido de delivery, en el estado que se le pase. */
 private function pedido(?User $cliente = null, ?Producto $producto = null, string $estado = 'pendiente'): Pedido
 {
     $cliente ??= User::factory()->create(['role' => User::ROL_CLIENTE]);

@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container pb-5">
-    <!-- Header Banner -->
     <div class="section-header text-center mb-5">
         <span class="section-subtitle">Ahorra y Disfruta</span>
         <h1 class="section-title">Promociones & Descuentos Especiales</h1>

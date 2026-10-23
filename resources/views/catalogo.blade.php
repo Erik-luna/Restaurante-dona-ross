@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container pb-5">
-    <!-- Header Banner -->
     <div class="section-header text-center mb-4">
         <span class="section-subtitle">Nuestra Carta Completa</span>
         <h1 class="section-title">Menú & Especialidades</h1>
@@ -14,7 +13,6 @@
         <div class="section-divider"></div>
     </div>
 
-    <!-- Filter Card -->
     <div class="card-ross p-4 mb-4">
         <form method="GET" action="{{ route('catalogo') }}" class="row g-3 align-items-center">
             <div class="col-lg-5 col-md-6">
@@ -55,7 +53,6 @@
         </form>
     </div>
 
-    <!-- Products Grid -->
     <div class="row g-4 mb-5">
         @forelse($productos as $producto)
         <div class="col-lg-4 col-md-6">
@@ -149,7 +146,6 @@
         @endforelse
     </div>
 
-    <!-- Pagination -->
     <div class="d-flex justify-content-center">
         {{ $productos->withQueryString()->links('pagination::bootstrap-5') }}
     </div>

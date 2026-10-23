@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container pb-5">
-    <!-- Hero Section -->
+
     <div class="card border-0 rounded-4 overflow-hidden mb-5 shadow-lg position-relative" style="background: linear-gradient(135deg, rgba(30, 5, 6, 0.88) 0%, rgba(90, 11, 13, 0.75) 50%, rgba(255, 87, 34, 0.45) 100%), url('{{ asset('img/platos/plato1.jpeg') }}') center/cover; min-height: 480px;">
         <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-center text-white my-auto">
             <div class="row align-items-center">
@@ -59,7 +59,6 @@
         </div>
     </div>
 
-    <!-- Feature Pillars -->
     <div class="row g-4 mb-5">
         <div class="col-md-3 col-sm-6">
             <div class="card-ross h-100 p-4 text-center">
@@ -99,7 +98,6 @@
         </div>
     </div>
 
-    <!-- Platos Destacados Section -->
     @if($destacados->count())
     <div class="section-header text-center">
         <span class="section-subtitle">Lo más pedido</span>
@@ -180,7 +178,6 @@
     </div>
     @endif
 
-    <!-- Promo Highlight Banner -->
     <div class="card border-0 rounded-4 overflow-hidden mb-5 text-white shadow" style="background: linear-gradient(135deg, var(--ross-primary) 0%, #4D090B 100%); border-left: 8px solid var(--ross-gold) !important;">
         <div class="card-body p-4 p-md-5">
             <div class="row align-items-center">
@@ -202,7 +199,6 @@
         </div>
     </div>
 
-    <!-- la parte del horrario -->
     <div class="row g-4">
         <div class="col-md-4">
             <div class="card-ross h-100 p-4 d-flex flex-row align-items-center gap-3">
@@ -214,7 +210,6 @@
                     <p class="text-muted small mb-1">
                         {{ $horarioHoy?->nombreDia() }}: {{ $horarioHoy?->rango() ?? 'no configurado' }}
                     </p>
-                    <!-- Indicador de estado caundo el restaurente habra -->
                     @if($horarioHoy?->estaAbierto())
                         <span class="badge bg-success-subtle text-success small">Abierto ahora</span>
                     @else

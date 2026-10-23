@@ -11,15 +11,6 @@ use App\Models\VentaItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * Pruebas de la venta de salón como entidad propia.
- *
- * La venta comparte con el pedido de delivery la misma operación contable (platos
- * vendidos, total, quién lo atendió), pero no el mismo negocio: una se paga en el
- * mostrador en el momento y la otra se cobra después de entregarse. Estas pruebas
- * fijan esa separación: que la venta viva en su tabla, que su línea guarde el
- * precio con el que se vendió y que no se confunda con un pedido.
- */
 class VentaTest extends TestCase
 {
     use RefreshDatabase;
@@ -42,8 +33,6 @@ class VentaTest extends TestCase
 
     private function producto(float $precio = 35.00, int $stock = 20): Producto
     {
-        // El stock va en la jornada de hoy, no en el producto: es crearProducto()
-        // del TestCase base quien abre esa jornada.
         return $this->crearProducto($stock, ['precio' => $precio]);
     }
 
@@ -63,8 +52,6 @@ class VentaTest extends TestCase
             ->assertRedirect(route('cajero.ventas.index'));
 
         $this->assertSame(1, Venta::count());
-        // `pedidos` es sólo de delivery: registrar una venta de salón no debe
-        // dejar ni un pedido ahí, porque la cocina no la tiene que preparar.
         $this->assertSame(0, Pedido::count());
     }
 
@@ -88,7 +75,6 @@ class VentaTest extends TestCase
         $this->assertSame('70.00', $item->subtotal);
         $this->assertSame($caja->id, $item->venta->caja_id);
 
-        // Si el producto sube de precio mañana, el histórico no debe cambiar.
         $producto->update(['precio' => 50.00]);
 
         $this->assertSame('35.00', $item->fresh()->precio_unitario);
@@ -108,14 +94,9 @@ class VentaTest extends TestCase
             ]);
 
         $venta = Venta::sole();
-
-        // A diferencia de un pedido de delivery, no hay un paso de cobro aparte:
-        // la venta se paga en el mostrador, así que nace pagada.
         $this->assertTrue($venta->estaPagada());
         $this->assertSame($caja->id, $venta->caja_id);
         $this->assertSame(Venta::PAGO_QR, $venta->metodo_pago);
-
-        // Con QR no se recibe efectivo ni se devuelve cambio.
         $this->assertNull($venta->monto_recibido);
         $this->assertNull($venta->cambio);
     }
@@ -162,7 +143,6 @@ class VentaTest extends TestCase
             ->assertOk()
             ->viewData('pedidos');
 
-        // La venta ya se cobró y se sirvió en mesa: no hay nada que preparar.
         $this->assertCount(0, $pedidos);
     }
 
@@ -185,9 +165,6 @@ class VentaTest extends TestCase
         $this->actingAs($admin)
             ->delete(route('admin.productos.destroy', $producto))
             ->assertRedirect(route('admin.productos.index'));
-
-        // La venta antigua debe seguir siendo legible: el producto se desactiva,
-        // no se elimina.
         $this->assertNotNull($producto->fresh());
         $this->assertFalse($producto->fresh()->activo);
         $this->assertSame(1, VentaItem::where('producto_id', $producto->id)->count());

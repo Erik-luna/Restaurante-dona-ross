@@ -28,8 +28,8 @@
     </div>
 </div>
 
-{{-- Sin caja abierta no se pueden registrar ventas ni cobros: el dinero no
-     tendría dónde entrar. Se avisa arriba de todo, no en letra pequeña. --}}
+
+
 @if(! $caja)
     <div class="p-4 rounded-4 border border-warning bg-warning-subtle mb-4">
         <div class="d-flex align-items-center gap-3">

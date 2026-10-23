@@ -14,9 +14,9 @@
     </div>
 </div>
 
-{{-- Cada bloque es su propio formulario a propósito: los horarios y el teléfono no se
-     guardan juntos, así que un error en uno no debería hacer perder lo que se cambió
-     en el otro. --}}
+
+
+
 <div class="row g-4">
     <div class="col-xl-7">
         <div class="card-ross p-4">
@@ -58,9 +58,9 @@
                                                required>
                                     </td>
                                     <td class="text-center">
-                                        {{-- El checkbox desmarcado no viaja en el formulario.
-                                             Por eso el value="1" explícito: sin él, un
-                                             "apagado" y un "nunca enviado" serían lo mismo. --}}
+
+
+
                                         <input type="hidden" name="dias[{{ $horario->dia }}][activo]" value="0">
                                         <input class="form-check-input" type="checkbox"
                                                name="dias[{{ $horario->dia }}][activo]" value="1"
@@ -116,8 +116,8 @@
             </form>
         </div>
 
-        {{-- Vista previa de lo que se verá abajo, para no tener que abrir la portada
-             para comprobar si el teléfono quedó bien. --}}
+
+
         <div class="card-ross p-4">
             <h6 class="fw-bold mb-3" style="color: var(--ross-primary);">
                 <i class="bi bi-eye text-danger me-2"></i> Así se verá en el pie

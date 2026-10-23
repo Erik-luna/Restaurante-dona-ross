@@ -13,18 +13,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
-/**
- * Ventas presenciales (consumo en el salón).
- *
- * La venta de salón es una entidad propia, con su tabla (ventas) y sus líneas
- * (venta_items). Antes vivía en `pedidos` con una columna `tipo` que obligaba a
- * acordarse de filtrar en cada consulta; ahora cada consulta dice sola qué pide.
- *
- * Cada venta queda atada a la caja abierta en el momento de registrarla. Eso
- * permite que el arqueo del turno sume lo que realmente entró al cajón, y no
- * permite registrar una venta sin caja: si se pudiera vender sin abrir caja, el
- * dinero sería real pero no constaría en ningún arqueo.
- */
 class VentaController extends Controller
 {
     public function index()
@@ -41,35 +29,14 @@ class VentaController extends Controller
         $productos = Producto::where('activo', true)->conDisponible()->orderBy('nombre')->get();
         $clientes = User::where('role', User::ROL_CLIENTE)->where('activo', true)->orderBy('name')->get();
 
-        // Sin caja abierta no se puede cobrar: se avisa antes de llenar el
-        // formulario, no después de enviarlo.
         $caja = Caja::abiertaDeHoy(auth()->id());
 
         return view('ventas.create', compact('productos', 'clientes', 'caja'));
     }
-
-    /**
-     * Registro de venta presencial.
-     *
-     * Nota sobre el `strip_tags` que esta versión usaba: se eliminó. No es
-     * sanitización XSS — `strip_tags('<script>alert(1)</script>')` devuelve
-     * `alert(1)`, es decir, destruye el marcado pero conserva el contenido, y
-     * además mutaba el payload de la petición DESPUÉS de validar. La protección
-     * real es la validación por reglas (`notas` es texto plano acotado a 500
-     * caracteres) más el escapado de Blade en la vista al mostrar las notas.
-     *
-     * El precio nunca se recibe del cliente: se lee del producto dentro de la
-     * transacción. Y el stock tampoco se descuenta desde aquí: lo baja StockService
-     * bloqueando la fila de la jornada del día, que es donde vive la cuenta.
-     */
     public function store(VentaLocalRequestWeb $request, StockService $stock)
     {
         $data = $request->validated();
         $ventaId = null;
-
-        // Se comprueba la caja ANTES de la transacción. Si no hay ninguna abierta
-        // la venta no se registra: es preferible rechazarla a guardar una venta
-        // cuyo dinero no se puede atribuir a ninguna caja.
         $caja = Caja::abiertaDeHoy(auth()->id());
 
         if ($caja === null) {
@@ -98,19 +65,11 @@ class VentaController extends Controller
                         'subtotal' => $subtotal,
                     ];
                 }
-
-                // El pago de una venta de salón se registra junto con la venta: el
-                // cliente paga en el mostrador, así que no hay un paso de cobro
-                // posterior como en el delivery. La venta nace 'pagada'.
                 $metodo = (string) $request->input('metodo_pago', Venta::PAGO_EFECTIVO);
                 $total = round($total, 2);
                 $recibido = $request->filled('monto_recibido')
                     ? round((float) $request->input('monto_recibido'), 2)
                     : $total;
-
-                // Entregar menos de lo que vale la venta no es un cobro. Se
-                // comprueba aquí porque el total depende de los precios de la base
-                // de datos y el formulario no puede conocerlo de antemano.
                 if ($metodo === Venta::PAGO_EFECTIVO && $recibido < $total) {
                     throw new RuntimeException(
                         'El dinero recibido (Bs. '.number_format($recibido, 2)
@@ -141,10 +100,6 @@ class VentaController extends Controller
                         'subtotal' => $item['subtotal'],
                     ]);
                 }
-
-                // El consumo va después de guardar la venta: si el stock no alcanza,
-                // la excepción revierte también la venta y no queda una venta pagada
-                // por productos que nunca salieron de la cocina.
                 $stock->descontar($itemsData);
             });
         } catch (RuntimeException $e) {
@@ -157,9 +112,6 @@ class VentaController extends Controller
             'usuario_id' => auth()->id(),
             'ip' => $request->ip(),
         ]);
-
-        // Cada rol vuelve a su propio listado: el cajero al suyo y el
-        // administrador al del panel de administración.
         $ruta = auth()->user()->esAdministrador() ? 'admin.ventas.index' : 'cajero.ventas.index';
 
         return redirect()->route($ruta)->with('success', 'Venta registrada correctamente.');

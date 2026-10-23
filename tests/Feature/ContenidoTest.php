@@ -9,14 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
-/**
- * Pruebas del contenido del sitio: horarios y datos de contacto.
- *
- * Lo que se prueba aquí no es que el formulario se guarde, sino que lo guardado se vea
- * y **signifique** algo: que el indicador de "Abierto ahora" responda a la hora, que el
- * enlace del teléfono funcione con el número que el administrador escribió y que cerrar
- * un día lo saque del pie de página.
- */
 class ContenidoTest extends TestCase
 {
     use RefreshDatabase;
@@ -33,7 +25,6 @@ class ContenidoTest extends TestCase
         return User::factory()->administrador()->create();
     }
 
-    /** Los siete días con las horas que se le pasan. */
     private function horarios(array $horasPorDia): array
     {
         $dias = [];
@@ -50,7 +41,6 @@ class ContenidoTest extends TestCase
         return $dias;
     }
 
-    /** Fija el reloj en un día concreto y devuelve el número de día de la semana. */
     private function relojEn(string $fecha, int $hora, int $minuto = 0): int
     {
         $momento = Carbon::parse($fecha.' '.$hora.':'.str_pad((string) $minuto, 2, '0', STR_PAD_LEFT));
@@ -74,9 +64,6 @@ class ContenidoTest extends TestCase
 
         $this->assertSame('09:00:00', Horario::where('dia', 1)->value('apertura'));
         $this->assertSame('13:00:00', Horario::where('dia', 1)->value('cierre'));
-
-        // El resto de los días no se tocan: el formulario solo trae los días que se
-        // escribieron, y borrar los demás dejaría el resto de la semana sin horario.
         $this->assertSame('08:00:00', Horario::where('dia', 3)->value('apertura'));
     }
 
@@ -105,9 +92,6 @@ class ContenidoTest extends TestCase
                 'dias' => $this->horarios([1 => ['8 de la mañana', '13:00', 1]]),
             ])
             ->assertSessionHasErrors('dias.1.apertura');
-
-        // Y lo anterior sigue intacto: un envío inválido no puede haber guardado
-        // media semana de horarios.
         $this->assertSame('08:00:00', Horario::where('dia', 1)->value('apertura'));
     }
 
@@ -136,7 +120,6 @@ class ContenidoTest extends TestCase
             ])
             ->assertSessionHasErrors('telefono');
 
-        // Una red sin http:// no es una URL y no debe guardarse como si lo fuera.
         $this->actingAs($this->admin())
             ->put(route('admin.contenidos.contacto'), [
                 'telefono' => '+591 70000000',
@@ -157,8 +140,6 @@ class ContenidoTest extends TestCase
             ->assertSee('Contenido del Sitio')
             ->assertSee('Lunes')
             ->assertSee('Domingo')
-            // Los valores seeded aparecen en los campos, para que quien edita vea lo
-            // que hay y no un formulario en blanco.
             ->assertSee('value="08:00"', false)
             ->assertSee('+591 70000000');
     }
@@ -186,23 +167,14 @@ class ContenidoTest extends TestCase
 
     public function test_el_indicador_de_abierto_sigue_los_horarios(): void
     {
-        // 2026-10-05. Se usa el número de día que devuelva el reloj en lugar de
-        // asumir que es lunes, para que la prueba no dependa de qué día sea hoy.
         $dia = $this->relojEn('2026-10-05', 12);
 
         Horario::where('dia', $dia)->update(['apertura' => '09:00:00', 'cierre' => '20:00:00', 'activo' => true]);
-
         $this->assertTrue(Horario::deHoy()->estaAbierto());
-
-        // Justo a la hora de apertura está abierto; a la de cierre ya no. La
-        // diferencia importa: un local que cierra a las 20:00 no recibe pedidos a las
-        // 20:00.
         $this->relojEn('2026-10-05', 9, 0);
         $this->assertTrue(Horario::deHoy()->estaAbierto());
-
         $this->relojEn('2026-10-05', 20, 0);
         $this->assertFalse(Horario::deHoy()->estaAbierto());
-
         $this->relojEn('2026-10-05', 7, 0);
         $this->assertFalse(Horario::deHoy()->estaAbierto());
     }
@@ -220,7 +192,6 @@ class ContenidoTest extends TestCase
     {
         $dia = $this->relojEn('2026-10-05', 1);
 
-        // Cierra a las 02:00: a la una de la madrugada sigue abierto.
         Horario::where('dia', $dia)->update(['apertura' => '18:00:00', 'cierre' => '02:00:00', 'activo' => true]);
 
         $this->assertTrue(Horario::deHoy()->estaAbierto());
@@ -265,8 +236,6 @@ class ContenidoTest extends TestCase
             ->assertOk()
             ->assertSee('+591 (2) 71234567')
             ->assertSee('Calle Sucre 123, La Paz')
-            // El enlace se arma solo con los dígitos: "tel:+591 (2) 71234567" no
-            // funciona en ningún navegador.
             ->assertSee('tel:+591271234567')
             ->assertSee('https://wa.me/59171234567');
     }
@@ -288,7 +257,6 @@ class ContenidoTest extends TestCase
 
     public function test_el_pie_agrupa_los_dias_que_comparten_horario(): void
     {
-        // Las veces que aparecen agrupadas, tal como las pintaba la plantilla antes.
         $grupos = Horario::agrupados();
 
         $this->assertSame('Lunes a Viernes', $grupos[0]['etiqueta']);
@@ -296,9 +264,6 @@ class ContenidoTest extends TestCase
         $this->assertSame('Sábado', $grupos[1]['etiqueta']);
         $this->assertSame('09:00:00 - 21:00:00', $grupos[1]['rango']);
         $this->assertSame('Domingo', $grupos[2]['etiqueta']);
-
-        // Si un día del medio cambia de horario, se parte el grupo en dos: mentiría
-        // un "Lunes a Viernes" que incluyera un día que cierra a otra hora.
         Horario::where('dia', 3)->update(['cierre' => '22:00:00']);
 
         $grupos = Horario::agrupados();

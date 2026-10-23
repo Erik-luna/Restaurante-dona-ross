@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doña Ross - @yield('title', 'Panel de Control')</title>
-    <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="{{ asset('img/logo.jpeg') }}">
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap 5 & Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
@@ -48,7 +45,6 @@
             font-family: 'Playfair Display', Georgia, serif;
         }
 
-        /* Admin Topbar */
         .admin-topbar {
             background: #FFFFFF;
             border-bottom: 2px solid var(--ross-border);
@@ -66,7 +62,6 @@
             border: 2px solid var(--ross-gold);
         }
 
-        /* Sidebar */
         .admin-sidebar {
             background: linear-gradient(180deg, var(--ross-primary) 0%, var(--ross-primary-dark) 100%);
             min-height: calc(100vh - 62px);
@@ -134,7 +129,6 @@
             color: var(--ross-gold);
         }
 
-        /* Stat Card */
         .card-stat {
             background: #FFFFFF;
             border-radius: var(--ross-radius);
@@ -160,7 +154,6 @@
             font-size: 1.5rem;
         }
 
-        /* Admin Action Buttons */
         .btn-ross-primary {
             background: linear-gradient(135deg, var(--ross-orange) 0%, var(--ross-orange-hover) 100%);
             color: #FFFFFF !important;
@@ -197,7 +190,6 @@
             transform: translateY(-1px);
         }
 
-        /* Admin Table Styles */
         .table-card {
             background: #FFFFFF;
             border-radius: var(--ross-radius);
@@ -229,7 +221,6 @@
             background-color: #FCFAF7;
         }
 
-        /* Form Controls */
         .form-control, .form-select {
             border-radius: 10px;
             border: 1.5px solid #CBD5E1;
@@ -282,7 +273,6 @@
     @stack('styles')
 </head>
 <body>
-    <!-- Topbar -->
     <nav class="admin-topbar">
         <div class="container-fluid d-flex justify-content-between align-items-center gap-2">
             <div class="d-flex align-items-center gap-2 gap-sm-3">
@@ -326,10 +316,8 @@
         </div>
     </nav>
 
-    <!-- Main Container -->
     <div class="container-fluid p-0">
         <div class="row g-0">
-            <!-- Sidebar Col -->
             <div class="col-lg-2 admin-sidebar offcanvas-lg offcanvas-start"
                  tabindex="-1"
                  id="adminSidebar"
@@ -344,7 +332,6 @@
                 </div>
             </div>
 
-            <!-- Content Col -->
             <main class="col-12 col-lg-10 admin-content p-3 p-md-4 p-xl-5">
                 @include('partials.alerts')
                 @yield('content')
@@ -352,7 +339,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>

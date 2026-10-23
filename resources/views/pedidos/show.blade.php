@@ -15,7 +15,6 @@
 </div>
 
 <div class="row g-4">
-    <!-- Order Items Column -->
     <div class="col-lg-8">
         <div class="card-ross p-4 mb-4">
             <h5 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">
@@ -56,13 +55,7 @@
             </div>
         </div>
     </div>
-
-    <!-- Client & Status Column -->
     <div class="col-lg-4">
-        {{-- Estado: sólo el administrador y la cocina lo mueven. El cajero tiene
-             acceso a esta misma vista de consulta, pero NO existe una ruta
-             'cajero.pedidos.estado': por eso el formulario se esconde en lugar de
-             apuntar a una ruta que no está definida. --}}
         @if(auth()->user()->esAdministrador() || auth()->user()->esCocina())
             <div class="card-ross p-4 mb-4" style="border-top: 5px solid var(--ross-orange) !important;">
                 <h5 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">
@@ -87,9 +80,6 @@
                 </form>
             </div>
         @endif
-
-        {{-- Cobro: el dinero entra a la caja abierta del cajero o del
-             administrador. La cocina no cobra, así que no ve esta tarjeta. --}}
         @if(! auth()->user()->esCocina())
             <div class="card-ross p-4 mb-4" style="border-top: 5px solid var(--ross-primary) !important;">
                 <h5 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">
@@ -166,7 +156,6 @@
             </div>
         @endif
 
-        <!-- Customer Card -->
         <div class="card-ross p-4">
             <h5 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">
                 <i class="bi bi-person-lines-fill text-danger me-1"></i> Datos del Cliente

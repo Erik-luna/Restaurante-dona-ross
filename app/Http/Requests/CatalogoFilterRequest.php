@@ -5,7 +5,6 @@ namespace App\Http\Requests;
 use App\Support\Reglas;
 use Illuminate\Validation\Rule;
 
-//faltan cambios aqui para mas rato arreglar
 class CatalogoFilterRequest extends BaseRequest
 {
     public const ORDENES = ['recientes', 'precio_asc', 'precio_desc', 'nombre'];
@@ -15,9 +14,6 @@ class CatalogoFilterRequest extends BaseRequest
         return true;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     public function rules(): array
     {
         return [
@@ -44,7 +40,6 @@ class CatalogoFilterRequest extends BaseRequest
         return in_array($orden, self::ORDENES, true) ? $orden : 'recientes';
     }
 
-    //aquii colocar la seguriadd contra el xss
     public function termino(): string
     {
         $termino = $this->input('buscar');

@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="container pb-5">
-    <!-- Welcome Header Card -->
     <div class="card-ross p-4 p-md-5 mb-4 text-white shadow" style="background: linear-gradient(135deg, var(--ross-primary) 0%, #52090C 100%); border-left: 8px solid var(--ross-gold) !important;">
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
             <div class="d-flex align-items-center gap-3">
@@ -25,7 +24,6 @@
         </div>
     </div>
 
-    <!-- Stat Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-4">
             <div class="card-ross h-100 p-4 d-flex flex-column justify-content-between">
@@ -82,7 +80,7 @@
         </div>
     </div>
 
-    <!-- Recent Orders Table -->
+
     @if($pedidos->count())
     <div class="card-ross p-4">
         <div class="d-flex align-items-center justify-content-between mb-3">

@@ -67,11 +67,6 @@
     </div>
 </div>
 
-{{--
-    Los pedidos que la cocina tiene que atender. Cada uno muestra qué se pidió y
-    el botón para pasarlo al siguiente estado. El formulario va a la misma ruta
-    que usa el administrador: lo que cambia son los permisos, no la operación.
---}}
 <div class="table-card p-0">
     <div class="p-4 pb-2">
         <h5 class="fw-bold mb-0 font-serif" style="color: var(--ross-primary);">

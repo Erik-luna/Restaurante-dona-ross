@@ -37,9 +37,9 @@
     </div>
 </div>
 
-{{-- Los números que resumen el turno. Las ventas de salón y los cobros de
-     delivery van separados porque son operaciones distintas: si el arqueo no
-     cuadra, hay que poder saber de qué lado vino el problema. --}}
+
+
+
 <div class="row g-4 mb-4">
     <div class="col-md-6 col-xl-3">
         <div class="card-stat d-flex align-items-center justify-content-between">

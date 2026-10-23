@@ -4,19 +4,12 @@ namespace App\Http\Requests;
 
 use App\Models\Caja;
 
-/**
- * Cierre de caja: conteo del dinero y arqueo.
- */
 class CajaCierreRequest extends BaseRequest
 {
     public function authorize(): bool
     {
         return $this->caja() !== null && $this->puedeOperarEstaCaja($this->caja());
     }
-
-    /**
-     * @return array<string, mixed>
-     */
     public function rules(): array
     {
         return [
@@ -24,7 +17,6 @@ class CajaCierreRequest extends BaseRequest
             'observacion_cierre' => ['nullable', 'string', 'max:500'],
         ];
     }
-
     protected function mensajesPropios(): array
     {
         return [
@@ -32,10 +24,6 @@ class CajaCierreRequest extends BaseRequest
             'total_declarado.min' => 'El dinero contado no puede ser negativo.',
         ];
     }
-
-    /**
-     * @return array<int, callable>
-     */
     public function after(): array
     {
         return [
@@ -51,8 +39,6 @@ class CajaCierreRequest extends BaseRequest
             },
         ];
     }
-
-    /** La caja de la ruta. */
     public function caja(): ?Caja
     {
         $caja = $this->route('caja');

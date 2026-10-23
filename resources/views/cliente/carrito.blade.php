@@ -12,7 +12,6 @@
 
     @if(count($items))
     <div class="row g-4">
-        <!-- Products Column -->
         <div class="col-lg-8">
             <div class="card-ross p-4 mb-4">
                 <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
@@ -87,8 +86,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Checkout Column -->
         <div class="col-lg-4">
             <div class="card-ross p-4 position-sticky" style="top: 100px; border-top: 5px solid var(--ross-orange) !important;">
                 <h4 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">

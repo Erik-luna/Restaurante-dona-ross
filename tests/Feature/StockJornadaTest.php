@@ -11,30 +11,6 @@ use App\Services\StockService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use RuntimeException;
 use Tests\TestCase;
-
-/**
- * Pruebas del stock por jornada.
- *
- * Lo que se comprueba aquí es que el número de disponibles no dependa de que
- * alguien mantenga un contador al día, sino de que la jornada registre los cuatro
- * datos de los que sale. Tres cosas quedaron en el camino y estas pruebas son las
- * que las sujetan:
- *
- *  1. Que la fórmula del modelo y la del SQL no se separen. La disponibilidad se
- *     calcula en PHP (StockJornada::disponible) y en SQL (Producto::
- *     EXPRESION_DISPONIBLE), porque el catálogo filtra por ella. Son dos
- *     redacciones de la misma regla y basta con que una se quede atrás para que el
- *     catálogo ofrezca algo que el carrito luego rechaza.
- *
- *  2. Que la carga, la reposición y la merma se sumen a la jornada en vez de pisar
- *     una cifra absoluta. Si una de las tres se aplicara como "el stock ahora es
- *     X", la columna de mermas mentiría.
- *
- *  3. Que descontar stock no se pueda hacer desde dos sitios a la vez. Las ventas de
- *     salón y los pedidos de delivery son el mismo descuento con dos rutas
- *     distintas; si una de las dos se olvidara de la comprobación, vendería por
- *     debajo de cero.
- */
 class StockJornadaTest extends TestCase
 {
     use RefreshDatabase;
@@ -54,7 +30,6 @@ class StockJornadaTest extends TestCase
         return User::factory()->create(['role' => User::ROL_CLIENTE, 'activo' => true]);
     }
 
-    // ------------------------------------------------------------------ la fórmula
 
     public function test_la_disponibilidad_es_inicial_mas_entradas_menos_mermas_y_consumidos(): void
     {
@@ -74,10 +49,6 @@ class StockJornadaTest extends TestCase
         $this->assertSame(52, $jornada->disponible());
     }
 
-    /**
-     * La misma regla escrita dos veces: en PHP y en SQL. Si divergen, el catálogo
-     * puede ofrecer un plato que el carrito rechaza.
-     */
     public function test_el_sql_y_el_modelo_coinciden(): void
     {
         $producto = $this->crearProducto(30);
@@ -93,13 +64,9 @@ class StockJornadaTest extends TestCase
             'La fórmula de SQL y la del modelo dan números distintos: el catálogo y el carrito no se pondrían de acuerdo.'
         );
 
-        // Y el filtro por disponibilidad tiene que devolver lo mismo que la
-        // comprobación punto por punto.
         $conStock = Producto::where('activo', true)->conDisponible()->pluck('id')->all();
         $this->assertSame([$producto->id], $conStock);
 
-        // Con el mínimo en 34 ese producto ya no sale: el filtro no está mintiendo
-        // con un "> 0" fijo. El disponible quedó en 33 (30 + 12 - 2 - 7).
         $this->assertSame(
             [],
             Producto::where('activo', true)->conDisponible(null, 34)->pluck('id')->all()
@@ -115,14 +82,11 @@ class StockJornadaTest extends TestCase
         $this->assertSame(10, $producto->disponibleEn());
     }
 
-    // ------------------------------------------------------------------ los ajustes
-
     public function test_cargar_el_dia_pisa_el_inicial_y_reponer_lo_suma(): void
     {
         $cocina = $this->cocina();
         $producto = $this->crearProducto(20);
 
-        // Cargar corrige: se puede recargar el día con la cifra buena.
         $this->actingAs($cocina)->put(route('cocina.stock.update', $producto), [
             'accion' => StockJornada::ACCION_CARGAR,
             'cantidad' => 25,
@@ -131,8 +95,6 @@ class StockJornadaTest extends TestCase
         $this->assertSame(25, StockJornada::de($producto->id)->inicial);
         $this->assertSame(25, $producto->disponibleEn());
 
-        // Reponer suma a `entradas` y deja `inicial` como estaba. Si reponer
-        // sumara al inicial, la columna "cargadas" mentiría sobre lo preparado.
         $this->actingAs($cocina)->put(route('cocina.stock.update', $producto), [
             'accion' => StockJornada::ACCION_REPONER,
             'cantidad' => 15,
@@ -198,9 +160,6 @@ class StockJornadaTest extends TestCase
             'fecha' => $ayer,
         ])->assertRedirect(route('admin.stock.index'));
 
-        // El ajuste de ayer no debe tocar la jornada de hoy: son dos filas y dos
-        // números distintos, y esa es exactamente la confusión que provoca el
-        // contador único que estaba en la tabla de productos.
         $this->assertSame(35, $producto->disponibleEn($ayer));
         $this->assertSame(10, $producto->disponibleEn());
     }
@@ -217,8 +176,6 @@ class StockJornadaTest extends TestCase
 
         $this->assertSame(20, $producto->disponibleEn());
     }
-
-    // ------------------------------------------------------------------ el consumo
 
     public function test_no_se_puede_vender_mas_de_lo_que_hay(): void
     {
@@ -239,9 +196,6 @@ class StockJornadaTest extends TestCase
             $stock->descontar([['producto' => $producto, 'cantidad' => 5]]);
             $this->fail('Debió lanzar RuntimeException.');
         } catch (RuntimeException $e) {
-            // El mensaje va directo a la pantalla del cliente, así que tiene que
-            // decir el nombre del plato, lo que hay y lo que se pidió. Sin eso el
-            // usuario solo lee "stock insuficiente" y no sabe qué hacer.
             $this->assertStringContainsString($producto->nombre, $e->getMessage());
             $this->assertStringContainsString('quedan 2', $e->getMessage());
             $this->assertStringContainsString('se pidieron 5', $e->getMessage());
@@ -256,7 +210,6 @@ class StockJornadaTest extends TestCase
         $stock = new StockService;
         $stock->descontar([['producto' => $producto, 'cantidad' => 4]]);
 
-        // Hoy baja y ayer se queda igual: son dos filas independientes.
         $this->assertSame(16, $producto->disponibleEn());
         $this->assertSame(20, $producto->disponibleEn(now()->subDay()->toDateString()));
     }
@@ -284,8 +237,6 @@ class StockJornadaTest extends TestCase
         $cliente = $this->cliente();
         $producto = $this->crearProducto(2);
 
-        // Agregar tres veces a un producto con dos porciones: la tercera debe
-        // rechazarse en el servidor, no solo avisar en el botón.
         $this->actingAs($cliente)->post(route('cliente.carrito.add', $producto));
         $this->actingAs($cliente)->post(route('cliente.carrito.add', $producto));
         $this->actingAs($cliente)
@@ -302,9 +253,6 @@ class StockJornadaTest extends TestCase
         $cliente = $this->cliente();
         $producto = $this->crearProducto(5);
 
-        // Se agrega al carrito y luego se consume todo antes de confirmar: el
-        // carrito queda obsoleto sin que el cliente lo sepa, y el checkout debe
-        // rechazarlo en vez de dejar un pedido a medias.
         $this->actingAs($cliente)->post(route('cliente.carrito.add', $producto));
         StockJornada::de($producto->id)->consumir(5);
 
@@ -337,8 +285,6 @@ class StockJornadaTest extends TestCase
         $this->assertSame(18, $producto->disponibleEn());
     }
 
-    // ------------------------------------------------------------------ el catálogo
-
     public function test_el_catalogo_no_ofrece_un_plato_agotado_pero_lo_deja_visible(): void
     {
         $this->crearProducto(0, ['nombre' => 'Sin Portiones']);
@@ -346,8 +292,6 @@ class StockJornadaTest extends TestCase
 
         $this->get(route('catalogo'))
             ->assertOk()
-            // Agotado sigue apareciendo en la carta: si se ocultara, el cliente
-            // pensaría que el restaurante no lo tiene.
             ->assertSee('Sin Portiones')
             ->assertSee('Agotado')
             ->assertSee('Con Portiones')
@@ -369,8 +313,6 @@ class StockJornadaTest extends TestCase
             ->assertDontSee('Agotado Totalmente');
     }
 
-    // ------------------------------------------------------------------ la pantalla
-
     public function test_la_pantalla_de_stock_muestra_el_detalle_de_la_jornada(): void
     {
         $cocina = $this->cocina();
@@ -384,14 +326,12 @@ class StockJornadaTest extends TestCase
         $this->actingAs($cocina)
             ->get(route('cocina.stock.index'))
             ->assertOk()
-            ->assertSee('40')   // cargadas
-            ->assertSee('6')    // repuestas
-            ->assertSee('2')    // mermas
-            ->assertSee('5')    // vendidas
-            ->assertSee('39');  // disponibles
+            ->assertSee('40')
+            ->assertSee('6')
+            ->assertSee('2')
+            ->assertSee('5')
+            ->assertSee('39');
     }
-
-    /** Abre la caja del cajero, requisito previo para registrar ventas. */
     private function abrirCaja(User $cajero): void
     {
         $this->actingAs($cajero)->post(route('cajero.caja.store'), [

@@ -18,8 +18,6 @@
         </a>
     </div>
 </div>
-
-<!-- Stat Cards Grid -->
 <div class="row g-3 mb-4">
     <div class="col-xl-4 col-md-6">
         <div class="card-stat d-flex align-items-center justify-content-between">
@@ -99,8 +97,6 @@
         </div>
     </div>
 </div>
-
-<!-- orden de los card y en las tablas que tienen que hacer  -->    
 <div class="table-card p-4">
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h4 class="fw-bold mb-0 font-serif" style="color: var(--ross-primary);">

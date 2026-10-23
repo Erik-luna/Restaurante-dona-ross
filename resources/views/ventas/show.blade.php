@@ -24,7 +24,6 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="card-ross p-4 p-md-5 shadow-lg" style="border-top: 5px solid var(--ross-orange) !important;">
-            <!-- Header Ticket -->
             <div class="text-center pb-4 mb-4 border-bottom">
                 <img src="{{ asset('img/logo.jpeg') }}" alt="Logo" class="brand-logo-img mb-2" style="width: 50px; height: 50px;">
                 <h4 class="fw-bold font-serif mb-0" style="color: var(--ross-primary);">Doña Ross Restaurant</h4>
@@ -32,7 +31,6 @@
                 <span class="badge badge-ross-gold text-dark px-3 py-1 fw-bold">TICKET DE VENTA #{{ $venta->id }}</span>
             </div>
 
-            <!-- Meta info grid -->
             <div class="row g-3 mb-4 small">
                 <div class="col-sm-6">
                     <span class="text-muted d-block">Cliente:</span>
@@ -67,7 +65,6 @@
                 @endif
             </div>
 
-            <!-- Items Table -->
             <div class="table-responsive mb-4">
                 <table class="table align-middle">
                     <thead class="table-light">

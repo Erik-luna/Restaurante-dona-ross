@@ -4,11 +4,6 @@ namespace App\Http\Requests;
 
 use App\Support\Reglas;
 
-/**
- * Confirmación de pedido (web).
- *
- * El carrito vive en la sesión, así que aquí sólo se validan los datos de entrega.
- */
 class CheckoutRequest extends BaseRequest
 {
     public function authorize(): bool
@@ -16,9 +11,6 @@ class CheckoutRequest extends BaseRequest
         return $this->user()?->esCliente() === true;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     public function rules(): array
     {
         return [

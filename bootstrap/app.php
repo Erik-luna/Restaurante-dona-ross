@@ -14,26 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Alias del middleware de roles: ->middleware('role:cocina,administrador')
         $middleware->alias([
             'role' => CheckRole::class,
         ]);
-
-        // Cabeceras de seguridad de la respuesta. Se aplican al final para poder
-        // fijarse sobre la respuesta ya construida por los controladores y las vistas.
         $middleware->web(append: [
             SecurityHeaders::class,
         ]);
-
-        // Datos del contenido del sitio (teléfono, dirección, horarios) para todas las
-        // vistas, antes de que se renderice ninguna. Va en el grupo web porque las
-        // vistas públicas las necesitan y las del panel no.
         $middleware->web(prepend: [
             CompartirContenido::class,
         ]);
-
-        // Un visitante sin sesión que intente entrar al panel vuelve al formulario de
-        // acceso, no a la portada.
         $middleware->redirectGuestsTo(fn () => route('login.cliente'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {

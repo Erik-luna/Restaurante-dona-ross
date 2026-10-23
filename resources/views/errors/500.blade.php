@@ -1,12 +1,3 @@
-{{-- Respuesta de error genérica (500).
-
-     Este archivo existe para que el servidor NUNCA devuelva una traza de pila al
-     cliente. Un mensaje de excepción sin filtrar revela la ruta absoluta del
-     proyecto, la versión de PHP y de Laravel, los nombres de las clases internas y
-     —si el mensaje incluye la consulta— fragmentos del esquema de la base de
-     datos. Todo eso es un mapa gratis para un atacante.
-
-     El detalle real se registra en storage/logs/laravel.log para el equipo. --}}
 <!DOCTYPE html>
 <html lang="es">
 <head>

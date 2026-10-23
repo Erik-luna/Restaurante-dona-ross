@@ -116,17 +116,4 @@
         </table>
     </div>
 </div>
-<!-- Explicación de la pantalla 
-<div class="card border-0 shadow-sm rounded-4">
-    <div class="card-body">
-        <h6 class="fw-bold mb-2"><i class="bi bi-info-circle me-1"></i> Cómo se lee esta pantalla</h6>
-        <ul class="small text-muted mb-0 ps-3">
-            <li><strong>Cargar día</strong> fija cuántas porción(es) se preparan hoy. Si ya habías cargado mal un número, volver a cargar lo corrige.</li>
-            <li><strong>Reponer</strong> suma porción(es) que llegaron del proveedor durante el servicio.</li>
-            <li><strong>Merma</strong> resta porción(es) perdidas sin venderse y pide un motivo.</li>
-            <li>Las ventas y los pedidos de delivery descuentan solos; por eso no hay un campo para hacerlo a mano.</li>
-        </ul>
-    </div>
-</div>
--->
 @endsection

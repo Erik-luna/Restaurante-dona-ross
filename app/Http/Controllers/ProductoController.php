@@ -17,9 +17,7 @@ class ProductoController extends Controller
 {
     public function index()
     {
-        // El listado lleva la disponibilidad de hoy como columna calculada, para
-        // que el administrador vea si el plato está vendible sin abrir el control de
-        // stock en otra pestaña.
+
         $productos = Producto::with('categoria')
             ->select('productos.*')
             ->selectRaw(Producto::EXPRESION_DISPONIBLE.' as disponible', Producto::rangoDeFecha())
@@ -36,24 +34,12 @@ class ProductoController extends Controller
         return view('admin.productos.create', compact('categorias'));
     }
 
-    /**
-     * Alta de producto.
-     *
-     * El nombre del archivo de imagen NUNCA se toma del cliente: se genera un
-     * nombre aleatorio en el servidor. Usar el nombre enviado sería lo
-     * que permite escribir `../../.env` o sustituir un `.php` del directorio
-     * público, y además permitiría subir dos archivos con el mismo nombre y que
-     * uno pisara al otro sin aviso.
-     */
     public function store(ProductoRequest $request, StockService $stock)
     {
         $imagen = $request->hasFile('imagen')
             ? ['imagen' => $this->guardarImagen($request->file('imagen'))]
             : [];
 
-        // El alta y la carga de porciones de hoy van en la misma transacción: un
-        // producto creado sin sus porciones es un plato que el catálogo no puede
-        // ofrecer, y esa fila a medias solo se descubriría abriendo el catálogo.
         DB::transaction(function () use ($request, $imagen, $stock) {
             $producto = Producto::create($request->atributosProducto($imagen));
 
@@ -74,22 +60,11 @@ class ProductoController extends Controller
     {
         $categorias = Categoria::activas()->get();
 
-        // La carga del día se pasa aparte para que quede claro en la vista que es un
-        // dato de hoy y no una propiedad permanente del producto.
         $jornada = $producto->jornadaDeHoy();
 
         return view('admin.productos.edit', compact('producto', 'categorias', 'jornada'));
     }
 
-    /**
-     * Edición de producto.
-     *
-     * Aquí no se toca el stock del día. Si la ficha pisara `inicial` con el número
-     * que se escribe en el formulario, la jornada podría quedar con menos inicial
-     * que sus propios consumos y el plato aparecería en negativo. Para mover el
-     * stock del día está la pantalla de control de stock, que además lleva cuenta
-     * de lo ya vendido.
-     */
     public function update(ProductoRequest $request, Producto $producto)
     {
         $imagen = [];
@@ -108,14 +83,9 @@ class ProductoController extends Controller
         return redirect()->route('admin.productos.index')->with('success', 'Producto actualizado correctamente.');
     }
 
-    /**
-     * Baja de producto: si tiene historial se desactiva en lugar de borrarse, para
-     * conservar los pedidos y las ventas ya registrados.
-     */
     public function destroy(Producto $producto)
     {
-        // Se mira en las dos tablas: un producto que sólo se vendió en el salón
-        // tampoco puede borrarse, porque sus ventas deben seguir siendo legibles.
+
         if ($producto->tieneHistorial()) {
             $producto->forceFill(['activo' => false])->save();
 

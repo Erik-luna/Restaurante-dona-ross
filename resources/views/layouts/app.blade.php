@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doña Ross - @yield('title', 'Sabor Casero')</title>
-    <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="{{ asset('img/logo.jpeg') }}">
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap 5 & Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
@@ -53,7 +50,6 @@
             font-family: 'Playfair Display', Georgia, serif;
         }
 
-        /* Top Announcement Bar */
         .top-announcement {
             background: linear-gradient(90deg, var(--ross-primary-dark) 0%, var(--ross-primary) 100%);
             color: rgba(255, 255, 255, 0.9);
@@ -70,7 +66,6 @@
             color: #FFFFFF;
         }
 
-        /* Main Navbar */
         .navbar-ross {
             background: linear-gradient(135deg, var(--ross-primary) 0%, #680E10 100%);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -142,7 +137,6 @@
             100% { transform: scale(1); }
         }
 
-        /* Buttons */
         .btn-ross-primary {
             background: linear-gradient(135deg, var(--ross-orange) 0%, var(--ross-orange-hover) 100%);
             color: #FFFFFF !important;
@@ -247,7 +241,6 @@
             transform: translateY(-2px);
         }
 
-        /* Standard Cards */
         .card-ross {
             background: var(--ross-surface);
             border-radius: var(--ross-radius);
@@ -262,7 +255,6 @@
             border-color: rgba(255, 87, 34, 0.3);
         }
 
-        /* Section Headings */
         .section-header {
             position: relative;
             margin-bottom: 2.5rem;
@@ -290,7 +282,6 @@
             margin: 0 auto;
         }
 
-        /* Form Inputs */
         .form-control, .form-select {
             border-radius: 12px;
             border: 1.5px solid #D8D2C6;
@@ -311,7 +302,6 @@
             margin-bottom: 0.4rem;
         }
 
-        /* Dropdowns */
         .dropdown-menu-ross {
             border-radius: var(--ross-radius-sm);
             border: 1px solid var(--ross-border);
@@ -332,7 +322,6 @@
             color: var(--ross-orange);
         }
 
-        /* Footer */
         .footer-ross {
             background: linear-gradient(135deg, var(--ross-primary-dark) 0%, var(--ross-primary) 100%);
             color: rgba(255, 255, 255, 0.85);
@@ -398,7 +387,6 @@
             border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* Badge Custom */
         .badge-ross-primary {
             background-color: var(--ross-primary);
             color: #FFFFFF;
@@ -417,7 +405,6 @@
     @stack('styles')
 </head>
 <body>
-    <!-- Top Announcement Bar -->
     <div class="top-announcement d-none d-md-block">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-3">
@@ -435,7 +422,6 @@
         </div>
     </div>
 
-    <!-- Main Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-ross sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('home') }}">
@@ -500,7 +486,6 @@
                                 </ul>
                             </li>
                         @else
-                            {{-- Cualquier empleado: administrador, cajero o cocina. --}}
                             <li class="nav-item">
                                 <a class="btn btn-ross-gold btn-sm px-3 ms-2" href="{{ auth()->user()->rutaPanel() }}">
                                     <i class="bi bi-person-badge-fill me-1"></i>
@@ -534,7 +519,6 @@
         </div>
     </nav>
 
-    <!-- Main Content Area -->
     <main class="flex-grow-1 py-4">
         <div class="container">
             @include('partials.alerts')
@@ -542,11 +526,9 @@
         @yield('content')
     </main>
 
-    <!-- Professional Footer -->
     <footer class="footer-ross pt-5">
         <div class="container">
             <div class="row g-4 pb-4">
-                <!-- Brand Col -->
                 <div class="col-lg-4 col-md-6">
                     <div class="d-flex align-items-center gap-3 mb-3">
                         <img src="{{ asset('img/logo.jpeg') }}" alt="Logo" class="brand-logo-img" style="width: 54px; height: 54px;">
@@ -558,9 +540,6 @@
                     <p class="text-white-50 small pe-lg-3">
                         Dedicados a deleitar paladares con los mejores platillos tradicionales, preparados con recetas familiares, ingredientes frescos y la calidez de siempre.
                     </p>
-                    {{-- Cada red se muestra solo si el administrador la configuró. Un icono que lleva
-                         a "#" se ve como un enlace roto, así que si no hay URL no se
-                         pinta el icono. --}}
                     <div class="d-flex gap-2 pt-2">
                         @if($contenido['facebook'])
                             <a href="{{ $contenido['facebook'] }}" target="_blank" rel="noopener" class="footer-social-btn" title="Facebook"><i class="bi bi-facebook"></i></a>
@@ -574,7 +553,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Links -->
                 <div class="col-lg-2 col-md-6">
                     <h5>Navegación</h5>
                     <div class="footer-links">
@@ -585,7 +563,6 @@
                     </div>
                 </div>
 
-                <!-- Contact & Info -->
                 <div class="col-lg-3 col-md-6">
                     <h5>Contacto y Delivery</h5>
                     <div class="footer-links">
@@ -609,12 +586,8 @@
                     </div>
                 </div>
 
-                <!-- Horarios -->
                 <div class="col-lg-3 col-md-6">
                     <h5>Horarios de Atención</h5>
-                    {{-- Solo los días activos, y el filtro se hace aquí para que el
-                         borde inferior de la lista caiga en la última fila visible y
-                         no en la última fila configurada, que podría estar cerrada. --}}
                     @php $visibles = collect($horariosAgrupados)->where('activo', true)->values(); @endphp
                     <ul class="list-unstyled text-white-50 small mb-3">
                         @forelse($visibles as $grupo)
@@ -636,7 +609,6 @@
         <div class="footer-bottom">
             <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
                 <span class="text-white-50">&copy; {{ date('Y') }} Restaurante Doña Ross. Todos los derechos reservados.</span>
-                <!--<span class="text-white-50 small">Desarrollado con <i class="bi bi-heart-fill text-danger mx-1"></i> para la mejor experiencia gastronómica.</span>-->
             </div>
         </div>
     </footer>
@@ -645,4 +617,3 @@
     @stack('scripts')
 </body>
 </html>
-

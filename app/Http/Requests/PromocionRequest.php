@@ -2,19 +2,12 @@
 
 namespace App\Http\Requests;
 
-/**
- * Alta y edición de promociones del panel de administración.
- */
 class PromocionRequest extends BaseRequest
 {
     public function authorize(): bool
     {
         return $this->user()?->esAdministrador() === true;
     }
-
-    /**
-     * @return array<string, mixed>
-     */
     public function rules(): array
     {
         return [
@@ -38,10 +31,6 @@ class PromocionRequest extends BaseRequest
             'imagen.max' => 'La imagen no debe pesar más de 2 MB.',
         ];
     }
-
-    /**
-     * @return array<string, string>
-     */
     public function attributes(): array
     {
         return [
@@ -53,13 +42,6 @@ class PromocionRequest extends BaseRequest
             'imagen' => 'imagen',
         ];
     }
-
-    /**
-     * Datos de la promoción listos para guardar.
-     *
-     * @param  array<string, mixed>  $imagen  ['imagen' => ruta] si se subió un archivo.
-     * @return array<string, mixed>
-     */
     public function atributosPromocion(array $imagen = []): array
     {
         return array_merge([

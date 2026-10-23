@@ -16,8 +16,6 @@
     </a>
 </div>
 
-{{-- Sin caja abierta no se puede registrar la venta: el dinero no tendría
-     dónde entrar y el arqueo del turno saldría descuadrado. --}}
 @if(! $caja)
     <div class="p-4 rounded-4 border border-danger bg-danger-subtle mb-4">
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
@@ -41,7 +39,6 @@
 <form action="{{ route($prefix.'.ventas.store') }}" method="POST" id="ventaForm">
     @csrf
     <div class="row g-4">
-        <!-- Customer & Order details -->
         <div class="col-lg-5">
             <div class="card-ross p-4 mb-4" style="border-top: 5px solid var(--ross-primary) !important;">
                 <h5 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">
@@ -64,7 +61,6 @@
                             <i class="bi bi-person-plus me-1"></i> ¿Cliente nuevo? Registrar aquí
                         </a>
                     @else
-                        {{-- El alta de clientes es del administrador; el cajero sólo elige uno de la lista. --}}
                         <span class="text-muted small">
                             <i class="bi bi-info-circle me-1"></i>
                             Los clientes nuevos los registra el administrador.
@@ -110,8 +106,6 @@
                     </select>
                 </div>
 
-                {{-- El campo sólo aplica a efectivo. Con QR o tarjeta el dinero
-                     entra exacto y no hay cambio que dar, así que se oculta. --}}
                 <div class="mb-3" id="campoEfectivo">
                     <label class="form-label" for="monto_recibido">Dinero recibido (Bs.)</label>
                     <input type="number" step="0.01" min="0" name="monto_recibido" id="monto_recibido"
@@ -131,7 +125,6 @@
             </div>
         </div>
 
-        <!-- Products Builder -->
         <div class="col-lg-7">
             <div class="card-ross p-4" style="border-top: 5px solid var(--ross-orange) !important;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -210,9 +203,6 @@ document.getElementById('itemsContainer').addEventListener('click', function(e) 
     }
 });
 
-// Las filas nuevas se crean clonando la primera, y el clon no hereda los
-// escuchas de eventos. Sin esto, el límite de stock solo se aplicaría a la
-// primera fila y las siguientes aceptarían cualquier cantidad.
 document.getElementById('itemsContainer').addEventListener('change', function(e) {
     if (!e.target.classList.contains('producto-select')) return;
 
@@ -222,12 +212,6 @@ document.getElementById('itemsContainer').addEventListener('change', function(e)
     aplicarMaximo(e.target, input);
 });
 
-/*
- * El campo "dinero recibido" sólo tiene sentido cuando el cliente paga en
- * efectivo: con QR o tarjeta el dinero entra exacto y no hay cambio que dar.
- * Si se dejara visible, el cajero podría escribir un monto en un pago con QR y
- * el sistema lo guardaría como si fuera efectivo.
- */
 const metodoPago = document.getElementById('metodo_pago');
 const campoEfectivo = document.getElementById('campoEfectivo');
 const montoRecibido = document.getElementById('monto_recibido');
@@ -241,13 +225,6 @@ function sincronizarEfectivo() {
 metodoPago.addEventListener('change', sincronizarEfectivo);
 sincronizarEfectivo();
 
-/*
- * El límite de cantidad se recalcula según el platillo elegido, porque el stock
- * pertenece a la jornada de hoy y cada producto tiene el suyo. El `max` evita que
- * el cajero escriba de más; pero no es la defensa real: el servidor vuelve a
- * comprobarlo dentro de la transacción, y esta comprobación es solo para no
- * mandar a alguien a la pantalla de error por un número que se ve aquí.
- */
 function aplicarMaximo(select, input) {
     const opcion = select.options[select.selectedIndex];
     const disponible = opcion && opcion.dataset.stock !== undefined
@@ -271,4 +248,3 @@ aplicarMaximo(
 );
 </script>
 @endpush
-

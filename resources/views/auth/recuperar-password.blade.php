@@ -14,7 +14,7 @@
         </div>
 
         @if(session('recuperacion_email'))
-            {{-- Step 2: Verification code and new password --}}
+
             <div class="p-3 mb-4 rounded-4 text-center" style="background: var(--ross-gold-light); border: 1.5px dashed #D97706;">
                 <span class="text-muted small d-block mb-1">Tu código temporal de verificación es:</span>
                 <div class="fs-2 fw-bold font-monospace text-dark" style="letter-spacing: 8px;">
@@ -68,7 +68,7 @@
                 </a>
             </div>
         @else
-            {{-- Step 1: Request email --}}
+
             <form action="{{ route('password.codigo') }}" method="POST">
                 @csrf
                 <div class="mb-4">

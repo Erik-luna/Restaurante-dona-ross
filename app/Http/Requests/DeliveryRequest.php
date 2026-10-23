@@ -5,27 +5,12 @@ namespace App\Http\Requests;
 use App\Support\Reglas;
 use App\Support\Texto;
 
-/**
- * Formulario público de pedido a domicilio.
- *
- * No requiere autenticación, así que es la entrada más expuesta del proyecto:
- * cualquier visitante, y por tanto cualquier bot, puede invocarla.
- *
- * Las reglas de `cliente` y `telefono` son listas blancas estrictas porque ambos
- * campos se leen en voz alta por teléfono al cliente real: un `<script>` en el
- * nombre no aporta nada y sólo introduce riesgo. `pedido` y `direccion` admiten
- * texto libre acotado, porque una dirección legítima puede contener casi todo.
- */
 class DeliveryRequest extends BaseRequest
 {
     public function authorize(): bool
     {
         return true;
     }
-
-    /**
-     * @return array<string, mixed>
-     */
     public function rules(): array
     {
         return [

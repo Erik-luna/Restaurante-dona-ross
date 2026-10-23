@@ -6,19 +6,6 @@ use App\Support\Reglas;
 use App\Support\Texto;
 use Illuminate\Validation\Rule;
 
-/**
- * Alta y edición de clientes desde el panel web (administración y mostrador).
- *
- * Dos detalles a tener en cuenta:
- *
- *  - La contraseña se guarda sin hashear a mano. El modelo User declara el cast
- *    'password' => 'hashed', así que Laravel la hashea al asignarla. Si aquí se
- *    llamara a Hash::make(), se estaría hasheando un hash.
- *
- *  - La regla unique del correo ignora el id del propio cliente que se está
- *    editando (ignore($clienteId)), porque si no, al guardar sus propios datos
- *    el sistema lo rechazaría por tener el correo repetido.
- */
 class ClienteStoreRequest extends BaseRequest
 {
     public function authorize(): bool
@@ -26,9 +13,6 @@ class ClienteStoreRequest extends BaseRequest
         return $this->user()?->esAdministrador() === true;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     public function rules(): array
     {
         $clienteId = $this->route('cliente')?->id ?? $this->route('id');
@@ -45,11 +29,6 @@ class ClienteStoreRequest extends BaseRequest
         ];
     }
 
-    /**
-     * Datos de alta listos para `User::registrarCliente()`.
-     *
-     * @return array<string, mixed>
-     */
     public function datosCliente(): array
     {
         return [

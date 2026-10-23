@@ -14,17 +14,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Las cuatro cuentas de prueba, una por rol del sistema. Los roles se
-        // escriben con las constantes del modelo User para que un cambio de
-        // nomenclatura no deje el seeder desincronizado.
         User::updateOrCreate(
             ['email' => 'admin@donaross.com'],
             ['name' => 'Administrador', 'password' => Hash::make('admin123'), 'role' => User::ROL_ADMINISTRADOR, 'telefono' => '70000001', 'activo' => true]
         );
-
-        // La cuenta del cajero conserva el correo 'personal@donarross.com' que ya
-        // usaba el restaurante: sólo cambia su rol, de 'personal' a 'cajero'. así
-        // no se rompe el correo que el personal ya tiene memorizado.
         User::updateOrCreate(
             ['email' => 'personal@donaross.com'],
             ['name' => 'María García', 'password' => Hash::make('personal123'), 'role' => User::ROL_CAJERO, 'telefono' => '70000002', 'activo' => true]
@@ -43,10 +36,6 @@ class DatabaseSeeder extends Seeder
         $cat1 = Categoria::firstOrCreate(['nombre' => 'Platos Principales'], ['descripcion' => 'Nuestros platos estrella', 'estado' => Categoria::ESTADO_ACTIVA]);
         $cat2 = Categoria::firstOrCreate(['nombre' => 'Bebidas'], ['descripcion' => 'Refrescos y jugos naturales', 'estado' => Categoria::ESTADO_ACTIVA]);
         $cat3 = Categoria::firstOrCreate(['nombre' => 'Postres'], ['descripcion' => 'Dulces caseros', 'estado' => Categoria::ESTADO_ACTIVA]);
-
-// `porciones` NO es una columna de productos: es la carga de la jornada de HOY, y
-        // va en stock_jornadas. Se crea dentro del bucle, junto con el producto, para
-        // que un seed no deje platos sin existencias en la carta.
         $productos = [
             ['nombre' => 'Silpancho Tradicional', 'descripcion' => 'Carne, arroz, papa y huevo frito.', 'precio' => 35, 'porciones' => 50, 'destacado' => true, 'categoria_id' => $cat1->id],
             ['nombre' => 'Fricasé Paceño', 'descripcion' => 'Cerdo cocido con chuño y maíz.', 'precio' => 30, 'porciones' => 40, 'destacado' => true, 'categoria_id' => $cat1->id],
@@ -60,10 +49,6 @@ class DatabaseSeeder extends Seeder
             unset($p['porciones']);
 
             $producto = Producto::updateOrCreate(['nombre' => $p['nombre']], array_merge($p, ['activo' => true]));
-
-            // La jornada se fija con updateOrCreate y no con obtenerOCrear() para no
-            // pisar el `inicial`: si se vuelve a sembrar sobre datos reales, una
-            // reposición que ya se registró no debe desaparecer.
             StockJornada::updateOrCreate(
                 ['producto_id' => $producto->id, 'fecha' => now()->toDateString()],
                 ['inicial' => $porciones, 'motivo' => 'Carga inicial del sembrado.']
