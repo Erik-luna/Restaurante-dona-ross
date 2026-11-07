@@ -244,4 +244,5 @@ tests/Feature/        Pruebas de acceso, formularios, caja y ventas de salón
 
 ```bash
 php artisan test
-```
+```#   R e s t a u r a n t e - d o n a - r o s s  
+ 
