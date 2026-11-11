@@ -124,9 +124,10 @@ class CarritoController extends Controller
         }
 
         $total = 0.0;
+        $pedido = null;
 
         try {
-            DB::transaction(function () use ($carrito, $request, $stock, &$total) {
+            DB::transaction(function () use ($carrito, $request, $stock, &$total, &$pedido) {
                 $itemsData = [];
 
                 foreach ($carrito as $productoId => $cantidad) {
@@ -178,7 +179,7 @@ class CarritoController extends Controller
         $this->saveCarrito([]);
 
         return redirect()
-            ->route('cliente.pedidos')
+            ->route('cliente.pedidos.show', $pedido)
             ->with('success', '¡Pedido realizado con éxito en Doña Ross! Ya estamos preparándolo.');
     }
 }

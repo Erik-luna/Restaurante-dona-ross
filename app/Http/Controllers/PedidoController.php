@@ -26,6 +26,21 @@ class PedidoController extends Controller
         return view('pedidos.show', compact('pedido'));
     }
 
+    public function comprobante(Pedido $pedido)
+    {
+        $user = auth()->user();
+        $esDuenio = $user && (int) $pedido->user_id === (int) $user->id;
+        $esPersonal = $user && ($user->esAdministrador() || $user->esCajero() || $user->esCocina());
+
+        if (! $esDuenio && ! $esPersonal) {
+            abort(403, 'No tienes permiso para ver el comprobante de este pedido.');
+        }
+
+        $pedido->load(['user', 'items.producto', 'atendidoPor']);
+
+        return view('pedidos.comprobante', compact('pedido'));
+    }
+
     public function updateEstado(PedidoEstadoRequestWeb $request, Pedido $pedido, StockService $stock)
     {
         $estadoAnterior = $pedido->estado;

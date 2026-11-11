@@ -69,7 +69,7 @@ test('CP-10: el checkout se permite en la apertura exacta', function () {
 
     $this->actingAs($cliente)
         ->post(route('cliente.checkout'), p1DatosCheckout())
-        ->assertRedirect(route('cliente.pedidos'));
+        ->assertRedirect(route('cliente.pedidos.show', Pedido::latest('id')->first()));
 
     expect(Pedido::count())->toBe(1)
         ->and($producto->disponibleEn())->toBe(9);
@@ -86,7 +86,7 @@ test('CP-10: el checkout se permite un minuto antes del cierre', function () {
 
     $this->actingAs($cliente)
         ->post(route('cliente.checkout'), p1DatosCheckout())
-        ->assertRedirect(route('cliente.pedidos'));
+        ->assertRedirect(route('cliente.pedidos.show', Pedido::latest('id')->first()));
 
     expect(Pedido::count())->toBe(1)
         ->and($producto->disponibleEn())->toBe(9);
@@ -122,7 +122,7 @@ test('CP-11: un horario que cruza la medianoche permite pedir de noche', functio
 
     $this->actingAs($cliente)
         ->post(route('cliente.checkout'), p1DatosCheckout())
-        ->assertRedirect(route('cliente.pedidos'));
+        ->assertRedirect(route('cliente.pedidos.show', Pedido::latest('id')->first()));
 
     expect(Pedido::count())->toBe(1)
         ->and($producto->disponibleEn())->toBe(9);
@@ -139,7 +139,7 @@ test('CP-11: un horario que cruza la medianoche sigue abierto de madrugada', fun
 
     $this->actingAs($cliente)
         ->post(route('cliente.checkout'), p1DatosCheckout())
-        ->assertRedirect(route('cliente.pedidos'));
+        ->assertRedirect(route('cliente.pedidos.show', Pedido::latest('id')->first()));
 
     expect(Pedido::count())->toBe(1);
 });

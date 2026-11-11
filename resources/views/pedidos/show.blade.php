@@ -9,9 +9,14 @@
         <h2 class="fw-bold mb-1 font-serif" style="color: var(--ross-primary);">Pedido #{{ $pedido->id }}</h2>
         <p class="text-muted small mb-0">Registrado el {{ $pedido->created_at->format('d/m/Y \a \l\a\s H:i') }} hrs</p>
     </div>
-    <a href="{{ route(auth()->user()->panel().'.pedidos.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-        <i class="bi bi-arrow-left me-1"></i> Volver al listado
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('pedidos.comprobante', $pedido) }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" target="_blank">
+            <i class="bi bi-printer me-1"></i> Imprimir comprobante
+        </a>
+        <a href="{{ route(auth()->user()->panel().'.pedidos.index') }}" class="btn btn-ross-primary btn-sm rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1"></i> Volver al listado
+        </a>
+    </div>
 </div>
 
 <div class="row g-4">

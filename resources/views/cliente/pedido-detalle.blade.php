@@ -4,9 +4,12 @@
 
 @section('content')
 <div class="container pb-5">
-    <div class="mb-4">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
         <a href="{{ route('cliente.pedidos') }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left me-1"></i> Volver a Mis Pedidos
+        </a>
+        <a href="{{ route('pedidos.comprobante', $pedido) }}" class="btn btn-ross-primary btn-sm rounded-pill px-3 shadow-sm">
+            <i class="bi bi-printer me-1"></i> Imprimir comprobante
         </a>
     </div>
 
@@ -111,9 +114,9 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                    <span class="text-muted small">
-                        <i class="bi bi-shield-lock-fill text-success"></i> Acceso seguro verificado mediante IDOR Protection
-                    </span>
+                    <a href="{{ route('pedidos.comprobante', $pedido) }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                        <i class="bi bi-printer me-1"></i> Imprimir comprobante
+                    </a>
                     <a href="{{ route('cliente.pedidos') }}" class="btn btn-ross-primary btn-sm px-4">
                         Regresar
                     </a>

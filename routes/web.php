@@ -35,6 +35,7 @@ Route::post('/login-admin', [AuthController::class, 'loginAdmin'])
     ->middleware('throttle:6,1')
     ->name('login.admin.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::middleware('auth')->get('/pedidos/{pedido}/comprobante', [PedidoController::class, 'comprobante'])->name('pedidos.comprobante');
 Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')->group(function () {
     Route::get('/dashboard', [ClienteDashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito');

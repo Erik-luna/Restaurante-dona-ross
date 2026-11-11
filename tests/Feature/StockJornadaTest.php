@@ -232,7 +232,7 @@ class StockJornadaTest extends TestCase
                 'direccion_entrega' => 'Calle Falsa 123',
                 'telefono_contacto' => '70000000',
             ])
-            ->assertRedirect(route('cliente.pedidos'));
+            ->assertRedirect(route('cliente.pedidos.show', Pedido::latest('id')->first()));
 
         $this->assertSame(1, Pedido::count());
         $this->assertSame(9, $producto->disponibleEn());
