@@ -13,12 +13,12 @@ class PublicController extends Controller
     public function index()
     {
 
-        $destacados = Producto::where('activo', true)
+        $destacados = Producto::with('categoria')
+            ->where('activo', true)
             ->where('destacado', true)
             ->select('productos.*')
             ->selectRaw(Producto::EXPRESION_DISPONIBLE.' as disponible', Producto::rangoDeFecha())
             ->orderBy('id', 'asc')
-            ->take(3)
             ->get();
 
         $promociones = Promocion::vigentes()

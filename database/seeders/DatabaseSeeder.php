@@ -31,16 +31,154 @@ class DatabaseSeeder extends Seeder
         $this->usuarioInicial('cocina@donaross.com', 'Cocina Doña Ross', User::ROL_COCINA, '70000004', 'SEED_COCINA_PASSWORD');
         $this->usuarioInicial('cliente@correo.com', 'Juan Pérez', User::ROL_CLIENTE, '70000003', 'SEED_CLIENTE_PASSWORD', 'Av. Principal #456');
 
-        $cat1 = Categoria::firstOrCreate(['nombre' => 'Platos Principales'], ['descripcion' => 'Nuestros platos estrella', 'estado' => Categoria::ESTADO_ACTIVA]);
-        $cat2 = Categoria::firstOrCreate(['nombre' => 'Bebidas'], ['descripcion' => 'Refrescos y jugos naturales', 'estado' => Categoria::ESTADO_ACTIVA]);
-        $cat3 = Categoria::firstOrCreate(['nombre' => 'Postres'], ['descripcion' => 'Dulces caseros', 'estado' => Categoria::ESTADO_ACTIVA]);
+        // 1. Asegurar exactamente las 3 categorías requeridas
+        $cat1 = Categoria::where('nombre', 'Platos Principales')->first()
+            ?? Categoria::firstOrNew(['nombre' => 'Platos principales']);
+        $cat1->nombre = 'Platos principales';
+        $cat1->descripcion = 'Platos tradicionales y especialidades bolivianas.';
+        $cat1->estado = Categoria::ESTADO_ACTIVA;
+        $cat1->save();
+
+        $cat2 = Categoria::firstOrNew(['nombre' => 'Bebidas']);
+        $cat2->descripcion = 'Refrescos y bebidas tradicionales bolivianas.';
+        $cat2->estado = Categoria::ESTADO_ACTIVA;
+        $cat2->save();
+
+        $cat3 = Categoria::firstOrNew(['nombre' => 'Postres']);
+        $cat3->descripcion = 'Postres y delicias dulces caseras típicas.';
+        $cat3->estado = Categoria::ESTADO_ACTIVA;
+        $cat3->save();
+
+        // Desactivar cualquier otra categoría no requerida
+        Categoria::whereNotIn('id', [$cat1->id, $cat2->id, $cat3->id])
+            ->update(['estado' => Categoria::ESTADO_INACTIVA]);
+
         $productos = [
-            ['nombre' => 'Silpancho Tradicional', 'descripcion' => 'Carne, arroz, papa y huevo frito.', 'precio' => 35, 'porciones' => 50, 'destacado' => true, 'categoria_id' => $cat1->id],
-            ['nombre' => 'Fricasé Paceño', 'descripcion' => 'Cerdo cocido con chuño y maíz.', 'precio' => 30, 'porciones' => 40, 'destacado' => true, 'categoria_id' => $cat1->id],
-            ['nombre' => 'Pique Macho', 'descripcion' => 'Carne, salchichas, papas fritas y huevo.', 'precio' => 45, 'porciones' => 30, 'destacado' => true, 'categoria_id' => $cat1->id],
-            ['nombre' => 'Jugo de Limonada', 'descripcion' => 'Limonada natural refrescante.', 'precio' => 8, 'porciones' => 100, 'destacado' => false, 'categoria_id' => $cat2->id],
-            ['nombre' => 'Postre de Helado', 'descripcion' => 'Helado artesanal de vainilla.', 'precio' => 12, 'porciones' => 25, 'destacado' => false, 'categoria_id' => $cat3->id],
+            // Platos principales
+            [
+                'nombre' => 'Pique Macho',
+                'descripcion' => 'Suculento plato tradicional con trozos de lomo de res, salchichas, papas fritas, huevo duro, cebolla, tomate y locoto.',
+                'precio' => 45.00,
+                'porciones' => 30,
+                'destacado' => true,
+                'categoria_id' => $cat1->id,
+                'imagen' => 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80',
+            ],
+            [
+                'nombre' => 'Silpancho Cochabambino',
+                'descripcion' => 'Fina carne apanada servida sobre cama de arroz blanco y papas doradas, coronada con dos huevos fritos y sarsa fresca.',
+                'precio' => 35.00,
+                'porciones' => 40,
+                'destacado' => true,
+                'categoria_id' => $cat1->id,
+                'imagen' => 'img/platos/plato_Silpancho_cochabambino.jpeg',
+            ],
+            [
+                'nombre' => 'Fricasé Paceño',
+                'descripcion' => 'Caldo tradicional y picante elaborado a base de carne de cerdo cocida a fuego lento con maíz pelado y chuño entero.',
+                'precio' => 38.00,
+                'porciones' => 35,
+                'destacado' => true,
+                'categoria_id' => $cat1->id,
+                'imagen' => 'img/platos/plato_fricase.jpeg',
+            ],
+            [
+                'nombre' => 'Saice Tarijeño',
+                'descripcion' => 'Clásico guisado tarijeño de carne picada con arvejas en ají colorado, servido con fideo, papa cocida y sarsa criolla.',
+                'precio' => 32.00,
+                'porciones' => 35,
+                'destacado' => true,
+                'categoria_id' => $cat1->id,
+                'imagen' => 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=800&auto=format&fit=crop&q=80',
+            ],
+            [
+                'nombre' => 'Chicharrón de Cerdo',
+                'descripcion' => 'Costillitas y trozos de cerdo crujientes cocidos en su propia manteca, acompañados de mote de maíz y llajwa casera.',
+                'precio' => 40.00,
+                'porciones' => 30,
+                'destacado' => true,
+                'categoria_id' => $cat1->id,
+                'imagen' => 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop&q=80',
+            ],
+            [
+                'nombre' => 'Ají de Llisa',
+                'descripcion' => 'Delicioso guiso andino de papas lisas picadas en juliana con carne de res, ají amarillo y hierbabuena tradicional.',
+                'precio' => 28.00,
+                'porciones' => 30,
+                'destacado' => true,
+                'categoria_id' => $cat1->id,
+                'imagen' => 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
+            ],
+            // Bebidas
+            [
+                'nombre' => 'Mocochinchi tradicional',
+                'descripcion' => 'Refrescante infusión hervida de duraznos deshidratados, aromatizada con canela, clavo de olor y azúcar caramelizada.',
+                'precio' => 7.00,
+                'porciones' => 80,
+                'destacado' => false,
+                'categoria_id' => $cat2->id,
+                'imagen' => 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=800&auto=format&fit=crop&q=80',
+            ],
+            [
+                'nombre' => 'Api con pastel',
+                'descripcion' => 'Bebida caliente y reconfortante de maíz morado con especias andinas, acompañada de pastel frito relleno de queso criollo.',
+                'precio' => 10.00,
+                'porciones' => 60,
+                'destacado' => false,
+                'categoria_id' => $cat2->id,
+                'imagen' => 'https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=800&auto=format&fit=crop&q=80',
+            ],
+            [
+                'nombre' => 'Somó',
+                'descripcion' => 'Tradicional bebida cruceña a base de maíz frangollo cocido, leche cremosa, canela y azúcar al punto.',
+                'precio' => 6.00,
+                'porciones' => 50,
+                'destacado' => false,
+                'categoria_id' => $cat2->id,
+                'imagen' => 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=800&auto=format&fit=crop&q=80',
+            ],
+            [
+                'nombre' => 'Refresco de Linaza',
+                'descripcion' => 'Refresco casero digestivo y saludable a base de semillas de linaza hervidas con cáscara de naranja y limón.',
+                'precio' => 5.00,
+                'porciones' => 70,
+                'destacado' => false,
+                'categoria_id' => $cat2->id,
+                'imagen' => 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&auto=format&fit=crop&q=80',
+            ],
+            // Postres
+            [
+                'nombre' => 'Helado de Canela artesanal',
+                'descripcion' => 'Tradicional helado de nieve batido a mano en barrilete de madera, aromatizado con canela paceña.',
+                'precio' => 8.00,
+                'porciones' => 50,
+                'destacado' => false,
+                'categoria_id' => $cat3->id,
+                'imagen' => 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&auto=format&fit=crop&q=80',
+            ],
+            [
+                'nombre' => 'Dulce de Cayote con Queso',
+                'descripcion' => 'Finas hebras de cayote confitadas en almíbar de clavo y naranja, servidas con tajada de queso fresco artesanal.',
+                'precio' => 10.00,
+                'porciones' => 40,
+                'destacado' => false,
+                'categoria_id' => $cat3->id,
+                'imagen' => 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&auto=format&fit=crop&q=80',
+            ],
+            [
+                'nombre' => 'Tawa-Tawas',
+                'descripcion' => 'Masitas fritas crujientes y esponjosas, generosamente bañadas con miel de caña pura de la región.',
+                'precio' => 6.00,
+                'porciones' => 60,
+                'destacado' => false,
+                'categoria_id' => $cat3->id,
+                'imagen' => 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80',
+            ],
         ];
+
+        $nombresNuevos = array_column($productos, 'nombre');
+        Producto::whereNotIn('nombre', $nombresNuevos)
+            ->update(['activo' => false, 'destacado' => false]);
 
         foreach ($productos as $p) {
             $porciones = $p['porciones'];
