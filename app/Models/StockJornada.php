@@ -121,4 +121,11 @@ public static function obtenerOCrear(int $productoId, ?string $fecha = null): se
 
         return $this;
     }
+
+    public function devolver(int $cantidad): self
+    {
+        $this->forceFill(['consumidos' => max(0, $this->consumidos - max(0, $cantidad))])->save();
+
+        return $this;
+    }
 }
