@@ -14,7 +14,6 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\PromocionController;
 use App\Http\Controllers\PublicController;
-use App\Http\Controllers\RecuperarPasswordController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\UsuarioController;
@@ -36,10 +35,6 @@ Route::post('/login-admin', [AuthController::class, 'loginAdmin'])
     ->middleware('throttle:6,1')
     ->name('login.admin.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/recuperar-password', [RecuperarPasswordController::class, 'formulario'])->name('password.formulario');
-Route::post('/recuperar-password', [RecuperarPasswordController::class, 'generarCodigo'])->name('password.codigo');
-Route::post('/recuperar-password/cambiar', [RecuperarPasswordController::class, 'cambiar'])->name('password.cambiar');
-Route::get('/recuperar-password/limpiar', [RecuperarPasswordController::class, 'limpiar'])->name('password.limpiar');
 Route::middleware(['auth', 'role:cliente'])->prefix('cliente')->name('cliente.')->group(function () {
     Route::get('/dashboard', [ClienteDashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito');

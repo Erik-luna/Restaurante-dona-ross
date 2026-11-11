@@ -26,7 +26,7 @@
             <div class="mb-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <label class="form-label mb-0">Contraseña</label>
-                    <a href="{{ route('password.formulario') }}" class="text-danger small text-decoration-none">¿Olvidaste tu contraseña?</a>
+                    <span class="text-muted small">Si olvidaste tu contraseña, comunícate con el restaurante.</span>
                 </div>
                 <div class="input-group mt-1">
                     <span class="input-group-text bg-white border-end-0" style="border-radius: 12px 0 0 12px; border-color: #D8D2C6;">
