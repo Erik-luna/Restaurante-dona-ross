@@ -15,7 +15,7 @@ class ProductoRequest extends BaseRequest
         return [
             'nombre' => ['required', 'string', 'min:3', 'max:150'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
-            'precio' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:99999.99'],
+            'precio' => ['required', 'numeric', 'decimal:0,2', 'gt:0', 'max:99999.99'],
             'porciones_iniciales' => [
                 'nullable',
                 'integer',
@@ -37,6 +37,7 @@ class ProductoRequest extends BaseRequest
             'nombre.min' => 'El nombre debe tener al menos 3 caracteres.',
             'precio.required' => 'Indica el precio del producto.',
             'precio.decimal' => 'El precio debe ser un número con como máximo dos decimales.',
+            'precio.gt' => 'El precio debe ser mayor que 0.',
             'precio.min' => 'El precio no puede ser negativo.',
             'porciones_iniciales.required' => 'Indica cuántas porción(es) se preparan para hoy.',
             'porciones_iniciales.min' => 'Las porción(es) no pueden ser negativas.',

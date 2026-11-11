@@ -10,7 +10,15 @@ class SecurityHeaders
 {
     public function handle(Request $request, Closure $next): Response
     {
+        @header_remove('X-Powered-By');
+
         $response = $next($request);
+
+        $response->headers->remove('X-Powered-By');
+
+        if ($request->isSecure() && app()->environment('production')) {
+            $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        }
 
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('X-Content-Type-Options', 'nosniff');

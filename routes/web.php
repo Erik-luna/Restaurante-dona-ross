@@ -29,7 +29,9 @@ Route::post('/login-cliente', [AuthController::class, 'loginCliente'])
     ->middleware('throttle:6,1')
     ->name('login.cliente.post');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('throttle:5,1')
+    ->name('register.post');
 Route::get('/login-admin', [AuthController::class, 'showAdminLogin'])->name('login.admin');
 Route::post('/login-admin', [AuthController::class, 'loginAdmin'])
     ->middleware('throttle:6,1')
