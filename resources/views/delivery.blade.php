@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Solicitud Rápida de Delivery')
+@section('title', 'Delivery a Domicilio')
 
 @section('content')
 <div class="container py-5">
@@ -11,75 +11,50 @@
                     <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 65px; height: 65px; background: var(--ross-orange-light); color: var(--ross-orange);">
                         <i class="bi bi-bicycle fs-2"></i>
                     </div>
-                    <h2 class="fw-bold font-serif mb-1" style="color: var(--ross-primary);">Pedido Rápido a Domicilio</h2>
-                    <p class="text-muted small mb-0">Completa tus datos y enviaremos tu pedido calientito hasta tu puerta.</p>
+                    <h2 class="fw-bold font-serif mb-1" style="color: var(--ross-primary);">Delivery a Domicilio</h2>
+                    <p class="text-muted small mb-0">Disfruta los platillos de Doña Ross sin salir de casa.</p>
                 </div>
 
-                <form action="{{ route('delivery.store') }}" method="POST">
-                    @csrf
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Nombre Completo *</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0" style="border-radius: 12px 0 0 12px; border-color: #D8D2C6;">
-                                    <i class="bi bi-person text-muted"></i>
-                                </span>
-                                <input type="text" name="cliente" class="form-control border-start-0 ps-0" value="{{ old('cliente') }}" placeholder="Ej: Juan Pérez" required style="border-radius: 0 12px 12px 0;">
-                            </div>
-                        </div>
+                <div class="mb-4">
+                    <p>
+                        Los pedidos a domicilio se toman desde nuestro catálogo online: así puedes elegir
+                        varios platillos, aplicar cupones de promoción y seguir el estado de tu pedido
+                        desde tu cuenta de cliente.
+                    </p>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="d-flex align-items-start mb-2">
+                            <i class="bi bi-check-circle-fill me-2 mt-1" style="color: var(--ross-orange);"></i>
+                            <span>Ingresa al catálogo y agrega tus platillos favoritos al carrito.</span>
+                        </li>
+                        <li class="d-flex align-items-start mb-2">
+                            <i class="bi bi-check-circle-fill me-2 mt-1" style="color: var(--ross-orange);"></i>
+                            <span>Regístrate o inicia sesión como cliente para confirmar tu pedido.</span>
+                        </li>
+                        <li class="d-flex align-items-start mb-2">
+                            <i class="bi bi-check-circle-fill me-2 mt-1" style="color: var(--ross-orange);"></i>
+                            <span>Indica la dirección exacta de entrega y elige tu método de pago.</span>
+                        </li>
+                        <li class="d-flex align-items-start">
+                            <i class="bi bi-check-circle-fill me-2 mt-1" style="color: var(--ross-orange);"></i>
+                            <span>Sigue el estado de tu pedido hasta que llegue calientito a tu puerta.</span>
+                        </li>
+                    </ul>
+                </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Teléfono de Contacto *</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0" style="border-radius: 12px 0 0 12px; border-color: #D8D2C6;">
-                                    <i class="bi bi-telephone text-muted"></i>
-                                </span>
-                                <input type="tel" name="telefono" class="form-control border-start-0 ps-0" value="{{ old('telefono') }}" placeholder="Ej: 71234567" required style="border-radius: 0 12px 12px 0;">
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Dirección Exacta de Entrega *</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0" style="border-radius: 12px 0 0 12px; border-color: #D8D2C6;">
-                                    <i class="bi bi-geo-alt text-muted"></i>
-                                </span>
-                                <textarea name="direccion" class="form-control border-start-0 ps-0" rows="2" placeholder="Calle, número de casa, referencias o piso..." required style="border-radius: 0 12px 12px 0;">{{ old('direccion') }}</textarea>
-                            </div>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Selecciona tu Platillo *</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0" style="border-radius: 12px 0 0 12px; border-color: #D8D2C6;">
-                                    <i class="bi bi-egg-fried text-muted"></i>
-                                </span>
-                                <select name="pedido" class="form-select border-start-0 ps-0" required style="border-radius: 0 12px 12px 0;">
-                                    <option value="Asado de Doña Ross">Asado Tradicional de Doña Ross</option>
-                                    <option value="Sopa de Maní Especial">Sopa de Maní Especial de la Casa</option>
-                                    <option value="Silpancho Tradicional">Silpancho Tradicional Cochabambino</option>
-                                    <option value="Pique Macho Criollo">Pique Macho Criollo</option>
-                                    <option value="Planchita Ross Especial">Planchita Ross Especial</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-ross-primary btn-lg w-100 py-3 shadow">
-                            <i class="bi bi-send-fill me-1"></i> Confirmar y Enviar Pedido Delivery
-                        </button>
-                    </div>
-                </form>
+                <div class="d-grid">
+                    <a href="{{ route('catalogo') }}" class="btn btn-ross-primary btn-lg py-3 shadow">
+                        <i class="bi bi-basket-fill me-1"></i> Pedir ahora
+                    </a>
+                </div>
 
                 <div class="text-center pt-3 border-top mt-4 text-muted small">
                     <p class="mb-0">
-                        ¿Deseas pedir múltiples platillos o usar cupones? 
-                        <a href="{{ route('catalogo') }}" class="text-danger fw-bold text-decoration-none">Visita el Catálogo Online</a>
+                        ¿Aún no tienes una cuenta?
+                        <a href="{{ route('register') }}" class="text-danger fw-bold text-decoration-none">Regístrate aquí</a>
                     </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
+@endsection

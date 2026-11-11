@@ -25,7 +25,6 @@ Route::get('/', [PublicController::class, 'index'])->name('home');
 Route::get('/catalogo', [PublicController::class, 'catalogo'])->name('catalogo');
 Route::get('/promociones', [PublicController::class, 'promociones'])->name('promociones');
 Route::get('/delivery', [DeliveryController::class, 'index'])->name('delivery.index');
-Route::post('/delivery/enviar', [DeliveryController::class, 'store'])->name('delivery.store');
 Route::get('/login-cliente', [AuthController::class, 'showClienteLogin'])->name('login.cliente');
 Route::post('/login-cliente', [AuthController::class, 'loginCliente'])
     ->middleware('throttle:6,1')
