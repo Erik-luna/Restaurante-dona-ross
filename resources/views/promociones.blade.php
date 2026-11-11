@@ -68,7 +68,7 @@
 
                     @if($promo->imagen)
                     <div class="col-sm-5 d-none d-sm-block">
-                        <img src="{{ asset('storage/'.$promo->imagen) }}" class="w-100 h-100" style="object-fit: cover; min-height: 220px;" alt="{{ $promo->titulo }}">
+                        <img src="{{ $promo->imagen_url }}" class="w-100 h-100" style="object-fit: cover; min-height: 220px;" alt="{{ $promo->titulo }}">
                     </div>
                     @endif
                 </div>

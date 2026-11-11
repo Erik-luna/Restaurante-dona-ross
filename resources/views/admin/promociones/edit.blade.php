@@ -53,7 +53,7 @@
                         <input type="file" name="imagen" class="form-control" accept="image/*">
                         @if($promocion->imagen)
                             <div class="d-flex align-items-center gap-2 mt-2">
-                                <img src="{{ asset('storage/'.$promocion->imagen) }}" class="rounded shadow-sm" width="100" height="60" style="object-fit: cover;">
+                                <img src="{{ $promocion->imagen_url }}" class="rounded shadow-sm" width="100" height="60" style="object-fit: cover;">
                                 <small class="text-muted">Banner actual</small>
                             </div>
                         @endif

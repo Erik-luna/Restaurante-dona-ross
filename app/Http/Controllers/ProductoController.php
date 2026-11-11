@@ -7,11 +7,9 @@ use App\Models\Categoria;
 use App\Models\Producto;
 use App\Models\StockJornada;
 use App\Services\StockService;
+use App\Support\Imagenes;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ProductoController extends Controller
 {
@@ -37,7 +35,7 @@ class ProductoController extends Controller
     public function store(ProductoRequest $request, StockService $stock)
     {
         $imagen = $request->hasFile('imagen')
-            ? ['imagen' => $this->guardarImagen($request->file('imagen'))]
+            ? ['imagen' => Imagenes::guardar($request->file('imagen'), 'platos')]
             : [];
 
         DB::transaction(function () use ($request, $imagen, $stock) {
@@ -71,13 +69,13 @@ class ProductoController extends Controller
         $imagenAnterior = $producto->imagen;
 
         if ($request->hasFile('imagen')) {
-            $imagen = ['imagen' => $this->guardarImagen($request->file('imagen'))];
+            $imagen = ['imagen' => Imagenes::guardar($request->file('imagen'), 'platos')];
         }
 
         $producto->update($request->atributosProducto($imagen));
 
         if ($imagen && $imagenAnterior) {
-            $this->eliminarImagen($imagenAnterior);
+            Imagenes::eliminar($imagenAnterior);
         }
 
         return redirect()->route('admin.productos.index')->with('success', 'Producto actualizado correctamente.');
@@ -96,47 +94,11 @@ class ProductoController extends Controller
         }
 
         if ($producto->imagen) {
-            $this->eliminarImagen($producto->imagen);
+            Imagenes::eliminar($producto->imagen);
         }
 
         $producto->delete();
 
         return redirect()->route('admin.productos.index')->with('success', 'Producto eliminado correctamente.');
-    }
-
-    private function guardarImagen(UploadedFile $imagen): string
-    {
-        $directorio = public_path('img/platos');
-        File::ensureDirectoryExists($directorio);
-
-        $nombre = Str::uuid().'.'.$imagen->extension();
-        $imagen->move($directorio, $nombre);
-
-        return 'img/platos/'.$nombre;
-    }
-
-    private function eliminarImagen(string $imagen): void
-    {
-        if (str_starts_with($imagen, 'img/platos/')) {
-            $nombre = substr($imagen, strlen('img/platos/'));
-
-            if ($nombre !== '' && basename($nombre) === $nombre) {
-                $ruta = public_path('img/platos/'.$nombre);
-
-                if (is_file($ruta) && ! unlink($ruta)) {
-                    throw new \RuntimeException('No se pudo eliminar la imagen del producto.');
-                }
-            }
-
-            return;
-        }
-
-        if (str_starts_with($imagen, 'productos/')) {
-            $nombre = substr($imagen, strlen('productos/'));
-
-            if ($nombre !== '' && basename($nombre) === $nombre) {
-                Storage::disk('public')->delete($imagen);
-            }
-        }
     }
 }

@@ -32,7 +32,7 @@
                     <td>
                         <div class="d-flex align-items-center gap-3">
                             @if($p->imagen)
-                                <img src="{{ asset('storage/'.$p->imagen) }}" alt="{{ $p->titulo }}" class="rounded-3 shadow-sm" style="width: 48px; height: 48px; object-fit: cover;">
+                                <img src="{{ $p->imagen_url }}" alt="{{ $p->titulo }}" class="rounded-3 shadow-sm" style="width: 48px; height: 48px; object-fit: cover;">
                             @else
                                 <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: var(--ross-orange-light); color: var(--ross-orange);">
                                     <i class="bi bi-tag-fill fs-5"></i>

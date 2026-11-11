@@ -7,8 +7,8 @@ use App\Models\Producto;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ControlAccesoTest extends TestCase
@@ -232,57 +232,51 @@ public function test_la_cola_de_cocina_prioriza_lo_que_no_se_empezo(): void
             ->assertSee($segundo->imagen_url, false);
     }
 
-    public function test_el_panel_guarda_y_actualiza_la_imagen_en_public_img_platos(): void
+    public function test_el_panel_guarda_y_actualiza_la_imagen_en_el_disco_de_imagenes(): void
     {
-        $rutasImagen = [];
+        // P5: la imagen ya no se copia al directorio público img/platos sino
+        // que se guarda en el disco configurado (por defecto "public").
+        Storage::fake('public');
 
-        try {
-            $this->actingAs(User::factory()->administrador()->create())
-                ->post(route('admin.productos.store'), [
-                    'nombre' => 'Plato con imagen',
-                    'descripcion' => 'Imagen de prueba',
-                    'precio' => 25,
-                    'porciones_iniciales' => 10,
-                    'imagen' => UploadedFile::fake()->createWithContent(
-                        'primera.png',
-                        base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWZ8AAAAASUVORK5CYII=')
-                    ),
-                ])
-                ->assertRedirect(route('admin.productos.index'));
+        $this->actingAs(User::factory()->administrador()->create())
+            ->post(route('admin.productos.store'), [
+                'nombre' => 'Plato con imagen',
+                'descripcion' => 'Imagen de prueba',
+                'precio' => 25,
+                'porciones_iniciales' => 10,
+                'imagen' => UploadedFile::fake()->createWithContent(
+                    'primera.png',
+                    base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWZ8AAAAASUVORK5CYII=')
+                ),
+            ])
+            ->assertRedirect(route('admin.productos.index'));
 
-            $producto = Producto::where('nombre', 'Plato con imagen')->firstOrFail();
-            $rutaAnterior = $producto->imagen;
-            $rutasImagen[] = $rutaAnterior;
+        $producto = Producto::where('nombre', 'Plato con imagen')->firstOrFail();
+        $rutaAnterior = $producto->imagen;
 
-            $this->assertStringStartsWith('img/platos/', $rutaAnterior);
-            $this->assertFileExists(public_path($rutaAnterior));
-            $this->assertSame(asset($rutaAnterior), $producto->imagen_url);
+        $this->assertStringStartsWith('platos/', $rutaAnterior);
+        Storage::disk('public')->assertExists($rutaAnterior);
+        $this->assertSame(Storage::disk('public')->url($rutaAnterior), $producto->imagen_url);
 
-            $this->actingAs(User::factory()->administrador()->create())
-                ->put(route('admin.productos.update', $producto), [
-                    'nombre' => $producto->nombre,
-                    'descripcion' => $producto->descripcion,
-                    'precio' => $producto->precio,
-                    'imagen' => UploadedFile::fake()->createWithContent(
-                        'segunda.png',
-                        base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWZ8AAAAASUVORK5CYII=')
-                    ),
-                ])
-                ->assertRedirect(route('admin.productos.index'));
+        $this->actingAs(User::factory()->administrador()->create())
+            ->put(route('admin.productos.update', $producto), [
+                'nombre' => $producto->nombre,
+                'descripcion' => $producto->descripcion,
+                'precio' => $producto->precio,
+                'imagen' => UploadedFile::fake()->createWithContent(
+                    'segunda.png',
+                    base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWZ8AAAAASUVORK5CYII=')
+                ),
+            ])
+            ->assertRedirect(route('admin.productos.index'));
 
-            $producto->refresh();
-            $rutaNueva = $producto->imagen;
-            $rutasImagen[] = $rutaNueva;
+        $producto->refresh();
+        $rutaNueva = $producto->imagen;
 
-            $this->assertNotSame($rutaAnterior, $rutaNueva);
-            $this->assertFileDoesNotExist(public_path($rutaAnterior));
-            $this->assertFileExists(public_path($rutaNueva));
-            $this->assertSame(asset($rutaNueva), $producto->imagen_url);
-        } finally {
-            foreach (array_unique($rutasImagen) as $ruta) {
-                File::delete(public_path($ruta));
-            }
-        }
+        $this->assertNotSame($rutaAnterior, $rutaNueva);
+        Storage::disk('public')->assertMissing($rutaAnterior);
+        Storage::disk('public')->assertExists($rutaNueva);
+        $this->assertSame(Storage::disk('public')->url($rutaNueva), $producto->imagen_url);
     }
 
     public function test_el_home_muestra_solo_productos_destacados(): void

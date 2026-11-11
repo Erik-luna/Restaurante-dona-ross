@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PromocionRequest;
 use App\Models\Promocion;
-use Illuminate\Support\Facades\Storage;
+use App\Support\Imagenes;
 
 class PromocionController extends Controller
 {
@@ -23,7 +23,7 @@ class PromocionController extends Controller
     public function store(PromocionRequest $request)
     {
         $imagen = $request->hasFile('imagen')
-            ? ['imagen' => $request->file('imagen')->store('promociones', 'public')]
+            ? ['imagen' => Imagenes::guardar($request->file('imagen'), 'promociones')]
             : [];
 
         Promocion::create($request->atributosPromocion($imagen));
@@ -42,10 +42,10 @@ class PromocionController extends Controller
 
         if ($request->hasFile('imagen')) {
             if ($promocione->imagen) {
-                Storage::disk('public')->delete($promocione->imagen);
+                Imagenes::eliminar($promocione->imagen);
             }
 
-            $imagen = ['imagen' => $request->file('imagen')->store('promociones', 'public')];
+            $imagen = ['imagen' => Imagenes::guardar($request->file('imagen'), 'promociones')];
         }
 
         $promocione->update($request->atributosPromocion($imagen));
@@ -56,7 +56,7 @@ class PromocionController extends Controller
     public function destroy(Promocion $promocione)
     {
         if ($promocione->imagen) {
-            Storage::disk('public')->delete($promocione->imagen);
+            Imagenes::eliminar($promocione->imagen);
         }
 
         $promocione->delete();

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Imagenes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
@@ -48,37 +49,7 @@ class Producto extends Model
 
     public function getImagenUrlAttribute(): ?string
     {
-        if (! $this->imagen) {
-            return null;
-        }
-
-        if (str_starts_with(strtolower($this->imagen), 'http://') || str_starts_with(strtolower($this->imagen), 'https://')) {
-            return $this->imagen;
-        }
-
-        $ruta = str_replace('\\', '/', ltrim($this->imagen, '/'));
-
-        if (str_starts_with($ruta, 'public/')) {
-            $ruta = substr($ruta, strlen('public/'));
-        }
-
-        if (str_starts_with($ruta, 'storage/')) {
-            return asset($ruta);
-        }
-
-        if (str_starts_with($ruta, 'img/')) {
-            return asset($ruta);
-        }
-
-        if (str_starts_with($ruta, 'productos/')) {
-            return asset('storage/'.$ruta);
-        }
-
-        if (str_starts_with($ruta, 'platos/')) {
-            return asset('img/'.$ruta);
-        }
-
-        return asset('img/platos/'.$ruta);
+        return Imagenes::url($this->imagen);
     }
 
     public function categoria(): BelongsTo

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Imagenes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -50,11 +51,6 @@ class Promocion extends Model
 
     public function getImagenUrlAttribute(): ?string
     {
-        if (! $this->imagen) {
-            return null;
-        }
-        return str_starts_with($this->imagen, 'http')
-            ? $this->imagen
-            : asset('storage/' . $this->imagen);
+        return Imagenes::url($this->imagen);
     }
 }
