@@ -199,6 +199,41 @@
         </div>
     </div>
 
+    @if($promociones->isNotEmpty())
+    <div class="row g-4 mb-5">
+        @foreach($promociones as $promo)
+        <div class="col-md-6">
+            <div class="card-ross h-100 p-4 position-relative" style="border-left: 6px solid var(--ross-orange) !important;">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    @if($promo->descuento_porcentaje)
+                        <span class="badge rounded-pill px-3 py-2 fw-bold" style="background: linear-gradient(135deg, var(--ross-orange) 0%, #E64A19 100%); color: white; font-size: 0.85rem;">
+                            <i class="bi bi-tag-fill me-1"></i> {{ (int)$promo->descuento_porcentaje }}% OFF
+                        </span>
+                    @else
+                        <span class="badge rounded-pill px-3 py-2 fw-bold" style="background: var(--ross-gold); color: #5A0B0D; font-size: 0.85rem;">
+                            <i class="bi bi-stars me-1"></i> Oferta Especial
+                        </span>
+                    @endif
+
+                    @if($promo->fecha_fin)
+                        <span class="badge bg-light text-muted border">
+                            <i class="bi bi-calendar3 me-1"></i> Hasta {{ $promo->fecha_fin->format('d/m/Y') }}
+                        </span>
+                    @endif
+                </div>
+
+                <h4 class="fw-bold mb-2 font-serif" style="color: var(--ross-primary);">{{ $promo->titulo }}</h4>
+                <p class="text-muted small mb-3" style="line-height: 1.6;">{{ $promo->descripcion }}</p>
+
+                <a href="{{ route('promociones') }}" class="btn btn-ross-outline btn-sm">
+                    <i class="bi bi-fire me-1"></i> Ver Promoción
+                </a>
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @endif
+
     <div class="row g-4">
         <div class="col-md-4">
             <div class="card-ross h-100 p-4 d-flex flex-row align-items-center gap-3">

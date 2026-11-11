@@ -21,10 +21,7 @@ class PublicController extends Controller
             ->take(3)
             ->get();
 
-        $promociones = Promocion::where('activo', true)
-            ->where(function ($q) {
-                $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', now());
-            })
+        $promociones = Promocion::vigentes()
             ->take(2)
             ->get();
 
@@ -54,11 +51,7 @@ class PublicController extends Controller
 
     public function promociones()
     {
-        $promociones = Promocion::where('activo', true)
-            ->where(function ($q) {
-                $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', now());
-            })
-            ->get();
+        $promociones = Promocion::vigentes()->get();
 
         return view('promociones', compact('promociones'));
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Promocion extends Model
@@ -16,6 +17,24 @@ class Promocion extends Model
         'imagen',
         'activo',
     ];
+
+    /**
+     * Promociones activas y dentro de su período de vigencia
+     * (fecha_inicio nula o <= hoy, fecha_fin nula o >= hoy, fechas inclusivas).
+     */
+    public function scopeVigentes(Builder $query): Builder
+    {
+        $hoy = now()->toDateString();
+
+        return $query
+            ->where('activo', true)
+            ->where(function (Builder $consulta) use ($hoy) {
+                $consulta->whereNull('fecha_inicio')->orWhereDate('fecha_inicio', '<=', $hoy);
+            })
+            ->where(function (Builder $consulta) use ($hoy) {
+                $consulta->whereNull('fecha_fin')->orWhereDate('fecha_fin', '>=', $hoy);
+            });
+    }
 
     protected function casts(): array
     {
