@@ -235,7 +235,7 @@
     @endif
 
     <div class="row g-4">
-        <div class="col-md-4">
+        <div class="{{ $qrPagoUrl ? 'col-md-6 col-lg-3' : 'col-md-4' }}">
             <div class="card-ross h-100 p-4 d-flex flex-row align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 56px; height: 56px; background-color: var(--ross-orange-light); color: var(--ross-orange);">
                     <i class="bi bi-clock-history fs-3"></i>
@@ -254,7 +254,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="{{ $qrPagoUrl ? 'col-md-6 col-lg-3' : 'col-md-4' }}">
             <div class="card-ross h-100 p-4 d-flex flex-row align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 56px; height: 56px; background-color: var(--ross-gold-light); color: #B45309;">
                     <i class="bi bi-geo-alt-fill fs-3"></i>
@@ -267,7 +267,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="{{ $qrPagoUrl ? 'col-md-6 col-lg-3' : 'col-md-4' }}">
             <div class="card-ross h-100 p-4 d-flex flex-row align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 56px; height: 56px; background-color: #E8F8F0; color: #10B981;">
                     <i class="bi bi-whatsapp fs-3"></i>
@@ -281,6 +281,18 @@
                 </div>
             </div>
         </div>
+
+        @if($qrPagoUrl)
+        <div class="col-md-6 col-lg-3">
+            <div class="card-ross h-100 p-4 d-flex flex-row align-items-center gap-3">
+                <img src="{{ $qrPagoUrl }}" alt="QR de Pago" class="rounded border shadow-sm flex-shrink-0" style="width: 56px; height: 56px; object-fit: contain; background: #fff;">
+                <div>
+                    <h5 class="fw-bold mb-1 font-serif">Paga por QR</h5>
+                    <p class="text-muted small mb-0">Escanea nuestro código para transferencias rápidas.</p>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 </div>
 @endsection

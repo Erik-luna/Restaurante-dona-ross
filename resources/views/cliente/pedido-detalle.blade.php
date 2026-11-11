@@ -78,6 +78,20 @@
                     </table>
                 </div>
 
+                @if($qrPagoUrl)
+                <div class="card border-0 bg-light p-3 rounded-3 mb-4 text-center">
+                    <h6 class="fw-bold mb-2 font-serif" style="color: var(--ross-primary);">
+                        <i class="bi bi-qr-code text-danger me-1"></i> Paga por QR
+                    </h6>
+                    <div class="d-flex justify-content-center my-2">
+                        <img src="{{ $qrPagoUrl }}" alt="Código QR de pago de Doña Ross" class="img-thumbnail rounded-3 shadow-sm" style="max-width: 180px; max-height: 180px; object-fit: contain; background: #fff;">
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Escanea este código desde la aplicación móvil de tu banco para pagar tu pedido.
+                    </p>
+                </div>
+                @endif
+
                 <h5 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">
                     <i class="bi bi-geo-alt-fill text-danger me-2"></i> Información de Entrega y Observaciones
                 </h5>

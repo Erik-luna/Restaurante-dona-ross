@@ -35,6 +35,17 @@ class Contenido extends Model
     {
         return static::enlaceTelefonico(static::valorDe('telefono'));
     }
+
+    public static function qrPagoUrl(): ?string
+    {
+        $ruta = static::valorDe('qr_pago');
+
+        if ($ruta === '' || ! \App\Support\Imagenes::existe($ruta)) {
+            return null;
+        }
+
+        return \App\Support\Imagenes::url($ruta);
+    }
     public static function whatsappEnlazable(): string
     {
         $digitos = preg_replace('/\D+/', '', static::valorDe('whatsapp'));

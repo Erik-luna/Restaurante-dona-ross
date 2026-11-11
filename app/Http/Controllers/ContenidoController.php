@@ -6,6 +6,7 @@ use App\Http\Requests\ContenidoRequest;
 use App\Http\Requests\HorarioRequest;
 use App\Models\Contenido;
 use App\Models\Horario;
+use App\Support\Imagenes;
 use Illuminate\Support\Facades\DB;
 
 class ContenidoController extends Controller
@@ -15,6 +16,7 @@ class ContenidoController extends Controller
         return view('admin.contenidos', [
             'horarios' => Horario::orderBy('dia')->get(),
             'contacto' => Contenido::valores(array_keys(Contenido::EDITABLES)),
+            'qrPagoUrl' => Contenido::qrPagoUrl(),
         ]);
     }
 
@@ -42,14 +44,34 @@ class ContenidoController extends Controller
     {
         $valores = $request->validated();
 
-        DB::transaction(function () use ($valores) {
+        DB::transaction(function () use ($request, $valores) {
+            if ($request->boolean('eliminar_qr_pago')) {
+                $anterior = Contenido::valorDe('qr_pago');
+                if ($anterior) {
+                    Imagenes::eliminar($anterior);
+                }
+                Contenido::updateOrCreate(
+                    ['clave' => 'qr_pago'],
+                    ['valor' => '']
+                );
+            } elseif ($request->hasFile('qr_pago')) {
+                $anterior = Contenido::valorDe('qr_pago');
+                if ($anterior) {
+                    Imagenes::eliminar($anterior);
+                }
+                $ruta = Imagenes::guardar($request->file('qr_pago'), 'contenidos');
+                Contenido::updateOrCreate(
+                    ['clave' => 'qr_pago'],
+                    ['valor' => $ruta]
+                );
+            }
+
             foreach ($valores as $clave => $valor) {
+                if (in_array($clave, ['qr_pago', 'eliminar_qr_pago'], true)) {
+                    continue;
+                }
                 Contenido::updateOrCreate(
                     ['clave' => $clave],
-
-
-
-
                     ['valor' => $valor ?? '']
                 );
             }

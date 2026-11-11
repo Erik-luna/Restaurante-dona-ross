@@ -20,6 +20,8 @@ class ContenidoRequest extends FormRequest
             'facebook' => ['nullable', 'url', 'max:255'],
             'instagram' => ['nullable', 'url', 'max:255'],
             'correo' => ['nullable', 'email', 'max:255'],
+            'qr_pago' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'eliminar_qr_pago' => ['nullable', 'boolean'],
         ];
     }
 
@@ -30,6 +32,9 @@ class ContenidoRequest extends FormRequest
             'whatsapp.regex' => 'El WhatsApp solo puede tener dígitos, espacios, guiones, paréntesis y el "+" inicial.',
             'facebook.url' => 'La dirección de Facebook debe empezar por http:// o https://',
             'instagram.url' => 'La dirección de Instagram debe empezar por http:// o https://',
+            'qr_pago.image' => 'El archivo debe ser una imagen.',
+            'qr_pago.mimes' => 'El QR debe ser una imagen en formato JPG, PNG o WebP.',
+            'qr_pago.max' => 'La imagen del QR no puede pesar más de 2 MB.',
         ];
     }
 
@@ -42,6 +47,7 @@ class ContenidoRequest extends FormRequest
             'facebook' => 'Facebook',
             'instagram' => 'Instagram',
             'correo' => 'correo',
+            'qr_pago' => 'código QR de pago',
         ];
     }
 }

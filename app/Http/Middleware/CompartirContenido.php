@@ -19,6 +19,7 @@ class CompartirContenido
             'contenido' => Contenido::valores(array_keys(Contenido::EDITABLES)),
             'telefonoEnlace' => Contenido::telefonoEnlazable(),
             'whatsappEnlace' => Contenido::whatsappEnlazable(),
+            'qrPagoUrl' => Contenido::qrPagoUrl(),
         ]);
 
         return $next($request);

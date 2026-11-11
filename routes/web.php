@@ -78,7 +78,7 @@ Route::middleware(['auth', 'role:administrador'])->prefix('admin')->name('admin.
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/contenido', [ContenidoController::class, 'index'])->name('contenidos.index');
     Route::put('/contenido/horarios', [ContenidoController::class, 'updateHorarios'])->name('contenidos.horarios');
-    Route::put('/contenido/contacto', [ContenidoController::class, 'updateContacto'])->name('contenidos.contacto');
+    Route::match(['put', 'post'], '/contenido/contacto', [ContenidoController::class, 'updateContacto'])->name('contenidos.contacto');
     Route::resource('productos', ProductoController::class)->except(['show']);
     Route::resource('promociones', PromocionController::class)->except(['show']);
     Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');

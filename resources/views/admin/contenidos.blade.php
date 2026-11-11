@@ -92,8 +92,9 @@
                 sitio se arma solo con los dígitos.
             </p>
 
-            <form action="{{ route('admin.contenidos.contacto') }}" method="POST">
+            <form action="{{ route('admin.contenidos.contacto') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                @method('PUT')
 
                 @foreach(['telefono' => 'Teléfono', 'whatsapp' => 'WhatsApp', 'direccion' => 'Dirección', 'facebook' => 'Facebook (URL)', 'instagram' => 'Instagram (URL)', 'correo' => 'Correo electrónico'] as $clave => $etiqueta)
                     <div class="mb-3">
@@ -107,6 +108,30 @@
                         @enderror
                     </div>
                 @endforeach
+
+                <div class="mb-3 pt-2 border-top">
+                    <label class="form-label small fw-semibold" for="contacto_qr_pago">Código QR de Pago</label>
+                    @if($qrPagoUrl)
+                        <div class="mb-2 p-2 bg-light border rounded-3 d-flex align-items-center gap-3">
+                            <img src="{{ $qrPagoUrl }}" alt="QR de Pago actual" class="rounded border shadow-sm" style="width: 80px; height: 80px; object-fit: contain; background: #fff;">
+                            <div>
+                                <div class="small fw-semibold text-dark">QR actual configurado</div>
+                                <div class="form-check mt-1">
+                                    <input class="form-check-input" type="checkbox" name="eliminar_qr_pago" value="1" id="eliminar_qr_pago">
+                                    <label class="form-check-label small text-danger" for="eliminar_qr_pago">
+                                        Eliminar este código QR
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    <input type="file" id="contacto_qr_pago" name="qr_pago" accept="image/jpeg,image/png,image/webp"
+                           class="form-control form-control-sm @error('qr_pago') is-invalid @enderror">
+                    <div class="form-text text-muted">Formatos: JPG, PNG o WebP (máx. 2 MB). Se muestra en la portada y en el detalle de pedidos.</div>
+                    @error('qr_pago')
+                        <div class="form-text text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
 
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-ross-primary">
