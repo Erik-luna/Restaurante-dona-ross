@@ -107,6 +107,23 @@
                     </span>
                 </div>
 
+                @php($restauranteAbierto = $horarioHoy !== null && $horarioHoy->estaAbierto())
+
+                @if(! $restauranteAbierto)
+                <div class="alert alert-warning border-warning-subtle rounded-3 mb-4" role="alert">
+                    <i class="bi bi-clock-fill text-warning me-1"></i>
+                    @if($horarioHoy)
+                        <strong>El restaurante está cerrado.</strong>
+                        Abrimos de {{ \Illuminate\Support\Carbon::parse($horarioHoy->apertura)->format('H:i') }}
+                        a {{ \Illuminate\Support\Carbon::parse($horarioHoy->cierre)->format('H:i') }}.
+                        Podrás enviar tu pedido dentro de nuestro horario de atención.
+                    @else
+                        <strong>El restaurante está cerrado hoy.</strong>
+                        No hay horario de atención configurado para este día.
+                    @endif
+                </div>
+                @endif
+
                 <h5 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">
                     <i class="bi bi-geo-alt-fill text-danger me-1"></i> Datos de Entrega
                 </h5>
@@ -128,9 +145,15 @@
                         <textarea name="notas" class="form-control" rows="2" placeholder="Ej: Sin cebolla, salsa extra, timbre al llegar...">{{ old('notas') }}</textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-ross-primary btn-lg w-100 py-3">
+                    <button type="submit" class="btn btn-ross-primary btn-lg w-100 py-3" @disabled(! $restauranteAbierto)>
                         <i class="bi bi-bag-check-fill fs-5"></i> Confirmar y Pedir Ahora
                     </button>
+
+                    @if(! $restauranteAbierto)
+                    <p class="text-muted small mt-2 mb-0 text-center">
+                        El botón se reactiva cuando abramos.
+                    </p>
+                    @endif
                 </form>
             </div>
         </div>

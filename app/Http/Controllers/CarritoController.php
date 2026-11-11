@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutRequest;
+use App\Models\Horario;
 use App\Models\Pedido;
 use App\Models\PedidoItem;
 use App\Models\Producto;
@@ -106,6 +107,20 @@ class CarritoController extends Controller
             return redirect()
                 ->route('cliente.carrito')
                 ->with('error', 'Tu carrito está vacío. Agrega platillos antes de continuar.');
+        }
+
+        $horario = Horario::deHoy();
+
+        if (! $horario || ! $horario->estaAbierto()) {
+            $mensaje = $horario
+                ? 'El restaurante está cerrado. Abrimos de '.\Illuminate\Support\Carbon::parse($horario->apertura)->format('H:i')
+                    .' a '.\Illuminate\Support\Carbon::parse($horario->cierre)->format('H:i').'.'
+                : 'El restaurante está cerrado hoy porque no hay horario de atención configurado para este día.';
+
+            return redirect()
+                ->route('cliente.carrito')
+                ->withInput()
+                ->with('error', $mensaje);
         }
 
         $total = 0.0;

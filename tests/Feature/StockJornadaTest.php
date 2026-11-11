@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Horario;
 use App\Models\Pedido;
 use App\Models\Producto;
 use App\Models\StockJornada;
@@ -216,6 +217,11 @@ class StockJornadaTest extends TestCase
 
     public function test_el_pedido_de_delivery_descuenta_el_stock_al_confirmarse(): void
     {
+        // P1: el checkout exige que el restaurante esté abierto; se abre todo
+        // el día para que esta prueba no dependa de la hora en que se ejecute.
+        Horario::where('dia', now()->isoWeekday())
+            ->update(['apertura' => '00:00:00', 'cierre' => '23:59:59', 'activo' => true]);
+
         $cliente = $this->cliente();
         $producto = $this->crearProducto(10);
 
@@ -250,6 +256,11 @@ class StockJornadaTest extends TestCase
 
     public function test_un_pedido_que_no_alcanza_no_se_guarda_ni_descuenta(): void
     {
+        // P1: esta prueba verifica el rechazo por stock, no por horario de
+        // atención, así que el restaurante se deja abierto todo el día.
+        Horario::where('dia', now()->isoWeekday())
+            ->update(['apertura' => '00:00:00', 'cierre' => '23:59:59', 'activo' => true]);
+
         $cliente = $this->cliente();
         $producto = $this->crearProducto(5);
 
