@@ -406,133 +406,198 @@
         margin-bottom: 2rem;
     }
     .carousel-dot {
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
         background-color: #D8D2C6;
         border: none;
         padding: 0;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .carousel-dot:hover {
+        background-color: var(--ross-orange);
+        transform: scale(1.15);
     }
     .carousel-dot.active {
-        width: 28px;
-        border-radius: 6px;
+        width: 32px;
+        border-radius: 8px;
         background: linear-gradient(90deg, var(--ross-primary) 0%, var(--ross-orange) 100%);
+        box-shadow: 0 2px 8px rgba(122, 17, 19, 0.28);
     }
 </style>
 @endpush
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const track = document.getElementById('carouselDestacadosTrack');
-    const prevBtn = document.getElementById('carouselDestacadosPrev');
-    const nextBtn = document.getElementById('carouselDestacadosNext');
-    const dotsContainer = document.getElementById('carouselDestacadosDots');
-    const container = document.getElementById('carouselDestacadosContainer');
+(function () {
+    function initCarouselDestacados() {
+        const track = document.getElementById('carouselDestacadosTrack');
+        const prevBtn = document.getElementById('carouselDestacadosPrev');
+        const nextBtn = document.getElementById('carouselDestacadosNext');
+        const dotsContainer = document.getElementById('carouselDestacadosDots');
+        const container = document.getElementById('carouselDestacadosContainer');
 
-    if (!track || !prevBtn || !nextBtn) return;
+        if (!track || !prevBtn || !nextBtn || !dotsContainer || !container) return;
 
-    const items = track.querySelectorAll('.carousel-ross-item');
-    if (items.length === 0) return;
+        const items = track.querySelectorAll('.carousel-ross-item');
+        if (items.length === 0) return;
 
-    function getSlideStep() {
-        if (items.length < 2) return track.clientWidth;
-        return items[1].offsetLeft - items[0].offsetLeft;
-    }
+        function getVisibleCount() {
+            if (window.innerWidth >= 992) return 3;
+            if (window.innerWidth >= 768) return 2;
+            return 1;
+        }
 
-    // Generar indicadores dinámicamente
-    if (dotsContainer) {
-        dotsContainer.innerHTML = '';
-        items.forEach(function (_, idx) {
-            const dot = document.createElement('button');
-            dot.className = 'carousel-dot' + (idx === 0 ? ' active' : '');
-            dot.setAttribute('type', 'button');
-            dot.setAttribute('aria-label', 'Ir al plato ' + (idx + 1));
-            dot.addEventListener('click', function () {
-                track.scrollTo({ left: items[idx].offsetLeft - track.offsetLeft, behavior: 'smooth' });
-            });
-            dotsContainer.appendChild(dot);
-        });
-    }
+        let visible = getVisibleCount();
+        let totalPages = Math.ceil(items.length / visible);
+        let currentPage = 0;
+        let isProgrammaticScroll = false;
 
-    const dots = dotsContainer ? dotsContainer.querySelectorAll('.carousel-dot') : [];
+        function renderDots() {
+            visible = getVisibleCount();
+            totalPages = Math.max(1, Math.ceil(items.length / visible));
+            dotsContainer.innerHTML = '';
 
-    function updateActiveDot() {
-        if (!dots.length) return;
-        const scrollLeft = track.scrollLeft;
-        let activeIdx = 0;
-        let minDiff = Infinity;
-        items.forEach(function (item, idx) {
-            const diff = Math.abs((item.offsetLeft - track.offsetLeft) - scrollLeft);
-            if (diff < minDiff) {
-                minDiff = diff;
-                activeIdx = idx;
+            for (let i = 0; i < totalPages; i++) {
+                const dot = document.createElement('button');
+                dot.className = 'carousel-dot' + (i === currentPage ? ' active' : '');
+                dot.setAttribute('type', 'button');
+                dot.setAttribute('aria-label', 'Ver grupo de platos ' + (i + 1) + ' de ' + totalPages);
+                dot.addEventListener('click', function () {
+                    goToPage(i);
+                });
+                dotsContainer.appendChild(dot);
             }
-        });
-        dots.forEach(function (dot, idx) {
-            dot.classList.toggle('active', idx === activeIdx);
-        });
-    }
-
-    track.addEventListener('scroll', updateActiveDot, { passive: true });
-
-    function slideNext() {
-        const step = getSlideStep();
-        const maxScroll = track.scrollWidth - track.clientWidth - 5;
-        if (track.scrollLeft >= maxScroll) {
-            track.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-            track.scrollBy({ left: step, behavior: 'smooth' });
         }
-    }
 
-    function slidePrev() {
-        const step = getSlideStep();
-        if (track.scrollLeft <= 5) {
-            track.scrollTo({ left: track.scrollWidth, behavior: 'smooth' });
-        } else {
-            track.scrollBy({ left: -step, behavior: 'smooth' });
+        function updateDotsUI(pageIndex) {
+            const dots = dotsContainer.querySelectorAll('.carousel-dot');
+            dots.forEach(function (dot, idx) {
+                dot.classList.toggle('active', idx === pageIndex);
+            });
         }
-    }
 
-    nextBtn.addEventListener('click', slideNext);
-    prevBtn.addEventListener('click', slidePrev);
+        function goToPage(pageIdx) {
+            if (pageIdx < 0) pageIdx = totalPages - 1;
+            if (pageIdx >= totalPages) pageIdx = 0;
+            currentPage = pageIdx;
+            isProgrammaticScroll = true;
 
-    // Navegación accesible por teclado al enfocar el carrusel
-    track.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowRight') {
+            const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+            let targetLeft = 0;
+
+            if (pageIdx === totalPages - 1) {
+                targetLeft = maxScroll;
+            } else {
+                const targetItem = items[pageIdx * visible];
+                if (targetItem) {
+                    targetLeft = Math.min(targetItem.offsetLeft - track.offsetLeft, maxScroll);
+                }
+            }
+
+            track.scrollTo({ left: targetLeft, behavior: 'smooth' });
+            updateDotsUI(currentPage);
+
+            setTimeout(function () {
+                isProgrammaticScroll = false;
+            }, 450);
+        }
+
+        function slideNext() {
+            const next = (currentPage + 1) >= totalPages ? 0 : currentPage + 1;
+            goToPage(next);
+        }
+
+        function slidePrev() {
+            const prev = (currentPage - 1) < 0 ? (totalPages - 1) : currentPage - 1;
+            goToPage(prev);
+        }
+
+        nextBtn.onclick = function (e) {
             e.preventDefault();
             slideNext();
-        } else if (e.key === 'ArrowLeft') {
+        };
+
+        prevBtn.onclick = function (e) {
             e.preventDefault();
             slidePrev();
+        };
+
+        track.addEventListener('scroll', function () {
+            if (isProgrammaticScroll) return;
+            const scrollLeft = track.scrollLeft;
+            const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+            let active = 0;
+
+            if (scrollLeft >= maxScroll - 15) {
+                active = totalPages - 1;
+            } else {
+                const step = track.clientWidth;
+                active = Math.min(totalPages - 1, Math.max(0, Math.round(scrollLeft / step)));
+            }
+
+            if (active !== currentPage) {
+                currentPage = active;
+                updateDotsUI(currentPage);
+            }
+        }, { passive: true });
+
+        // Teclado
+        track.onkeydown = function (e) {
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                slideNext();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                slidePrev();
+            }
+        };
+
+        // Autoplay fluido cada 4.5 segundos
+        let autoplayTimer = null;
+        function startAutoplay() {
+            stopAutoplay();
+            if (totalPages > 1) {
+                autoplayTimer = setInterval(slideNext, 4500);
+            }
         }
+        function stopAutoplay() {
+            if (autoplayTimer) {
+                clearInterval(autoplayTimer);
+                autoplayTimer = null;
+            }
+        }
+
+        container.onmouseenter = stopAutoplay;
+        container.onmouseleave = startAutoplay;
+        container.ontouchstart = stopAutoplay;
+        container.ontouchend = function () {
+            setTimeout(startAutoplay, 2000);
+        };
+
+        let resizeTimer = null;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                renderDots();
+                goToPage(Math.min(currentPage, totalPages - 1));
+            }, 150);
+        });
+
+        renderDots();
+        startAutoplay();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCarouselDestacados);
+    } else {
+        initCarouselDestacados();
+    }
+
+    window.addEventListener('spa:navigated', function () {
+        initCarouselDestacados();
     });
-
-    // Desplazamiento automático pausado al interactuar o posar el ratón
-    let autoplayTimer = null;
-    function startAutoplay() {
-        stopAutoplay();
-        if (items.length > 1) {
-            autoplayTimer = setInterval(slideNext, 5500);
-        }
-    }
-    function stopAutoplay() {
-        if (autoplayTimer) {
-            clearInterval(autoplayTimer);
-            autoplayTimer = null;
-        }
-    }
-
-    if (container) {
-        container.addEventListener('mouseenter', stopAutoplay);
-        container.addEventListener('mouseleave', startAutoplay);
-        container.addEventListener('touchstart', stopAutoplay, { passive: true });
-    }
-
-    startAutoplay();
-});
+})();
 </script>
 @endpush

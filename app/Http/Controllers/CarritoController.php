@@ -152,6 +152,7 @@ class CarritoController extends Controller
                     'direccion_entrega' => $request->validated('direccion_entrega'),
                     'telefono_contacto' => $request->validated('telefono_contacto'),
                     'notas' => $request->validated('notas'),
+                    'metodo_pago' => $request->validated('metodo_pago') ?: 'efectivo',
                 ]);
 
                 foreach ($itemsData as $item) {

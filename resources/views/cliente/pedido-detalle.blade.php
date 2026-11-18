@@ -81,19 +81,36 @@
                     </table>
                 </div>
 
-                @if($qrPagoUrl)
-                <div class="card border-0 bg-light p-3 rounded-3 mb-4 text-center">
-                    <h6 class="fw-bold mb-2 font-serif" style="color: var(--ross-primary);">
-                        <i class="bi bi-qr-code text-danger me-1"></i> Paga por QR
-                    </h6>
-                    <div class="d-flex justify-content-center my-2">
-                        <img src="{{ $qrPagoUrl }}" alt="Código QR de pago de Doña Ross" class="img-thumbnail rounded-3 shadow-sm" style="max-width: 180px; max-height: 180px; object-fit: contain; background: #fff;">
+                <div class="card border rounded-3 p-3 mb-4 bg-light">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 pb-2 border-bottom">
+                        <span class="text-muted small fw-semibold">Método de Pago Seleccionado:</span>
+                        <span class="badge rounded-pill px-3 py-1 {{ $pedido->metodo_pago === 'qr' ? 'bg-danger-subtle text-danger border border-danger' : 'bg-success-subtle text-success border border-success' }}">
+                            <i class="bi {{ $pedido->metodo_pago === 'qr' ? 'bi-qr-code' : 'bi-cash-stack' }} me-1"></i>
+                            {{ $pedido->metodo_pago === 'qr' ? 'Pago por QR / Transferencia' : 'Efectivo contra entrega' }}
+                        </span>
                     </div>
-                    <p class="text-muted small mb-0">
-                        Escanea este código desde la aplicación móvil de tu banco para pagar tu pedido.
-                    </p>
+
+                    @if($pedido->metodo_pago === 'qr')
+                        <div class="text-center py-2">
+                            <h6 class="fw-bold mb-1 font-serif" style="color: var(--ross-primary);">
+                                <i class="bi bi-qr-code text-danger me-1"></i> Código QR de Pago Doña Ross
+                            </h6>
+                            @if($qrPagoUrl)
+                                <div class="d-flex justify-content-center my-2">
+                                    <img src="{{ $qrPagoUrl }}" alt="Código QR de pago de Doña Ross" class="img-thumbnail rounded-3 shadow-sm" style="max-width: 180px; max-height: 180px; object-fit: contain; background: #fff;">
+                                </div>
+                            @endif
+                            <p class="text-muted small mb-0">
+                                Transfiere <strong>Bs. {{ number_format($pedido->total, 2) }}</strong> escaneando el código desde la aplicación móvil de tu banco (BCP, BNB, Banco Unión, etc.).
+                            </p>
+                        </div>
+                    @else
+                        <div class="d-flex align-items-center gap-2 text-success small py-1">
+                            <i class="bi bi-info-circle-fill fs-5"></i>
+                            <span>Pagarás en efectivo el monto exacto de <strong>Bs. {{ number_format($pedido->total, 2) }}</strong> al repartidor al recibir tu pedido.</span>
+                        </div>
+                    @endif
                 </div>
-                @endif
 
                 <h5 class="fw-bold mb-3 font-serif" style="color: var(--ross-primary);">
                     <i class="bi bi-geo-alt-fill text-danger me-2"></i> Información de Entrega y Observaciones

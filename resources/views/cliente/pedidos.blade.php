@@ -67,9 +67,15 @@
                 <div class="d-flex align-items-center justify-content-between pt-3 border-top border-light-subtle mt-3">
                     <div>
                         <span class="text-muted small d-block">Monto Total</span>
-                        <span class="fs-4 fw-bold" style="color: var(--ross-primary-dark);">
-                            Bs. {{ number_format($pedido->total, 2) }}
-                        </span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fs-4 fw-bold" style="color: var(--ross-primary-dark);">
+                                Bs. {{ number_format($pedido->total, 2) }}
+                            </span>
+                            <span class="badge rounded-pill px-2 py-1 border {{ $pedido->metodo_pago === 'qr' ? 'bg-danger-subtle text-danger border-danger' : 'bg-success-subtle text-success border-success' }}" style="font-size: 0.72rem;">
+                                <i class="bi {{ $pedido->metodo_pago === 'qr' ? 'bi-qr-code' : 'bi-cash-stack' }} me-1"></i>
+                                {{ $pedido->metodo_pago === 'qr' ? 'Pago QR' : 'Efectivo' }}
+                            </span>
+                        </div>
                     </div>
                     <a href="{{ route('cliente.pedidos.show', $pedido) }}" class="btn btn-ross-outline btn-sm">
                         <i class="bi bi-eye-fill me-1"></i> Ver Detalle

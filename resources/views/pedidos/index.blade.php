@@ -37,8 +37,13 @@
                         <div class="small fw-semibold">{{ $p->telefono_contacto ?: 'Sin teléfono' }}</div>
                         <small class="text-muted d-block text-truncate" style="max-width: 220px;">{{ $p->direccion_entrega ?: 'Sin dirección' }}</small>
                     </td>
-                    <td class="fw-bold fs-6" style="color: var(--ross-primary-dark);">
-                        Bs. {{ number_format($p->total, 2) }}
+                    <td>
+                        <div class="fw-bold fs-6" style="color: var(--ross-primary-dark);">
+                            Bs. {{ number_format($p->total, 2) }}
+                        </div>
+                        <span class="badge rounded-pill px-2 py-0 border {{ $p->metodo_pago === 'qr' ? 'bg-danger-subtle text-danger border-danger' : 'bg-light text-secondary' }}" style="font-size: 0.68rem;">
+                            <i class="bi {{ $p->metodo_pago === 'qr' ? 'bi-qr-code' : 'bi-cash' }} me-1"></i>{{ $p->metodo_pago === 'qr' ? 'QR' : 'Efectivo' }}
+                        </span>
                     </td>
                     <td>
                         @php

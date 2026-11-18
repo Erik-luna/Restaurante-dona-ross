@@ -177,8 +177,15 @@ class DatabaseSeeder extends Seeder
         ];
 
         $nombresNuevos = array_column($productos, 'nombre');
-        Producto::whereNotIn('nombre', $nombresNuevos)
-            ->update(['activo' => false, 'destacado' => false]);
+        $huerfanos = Producto::whereNotIn('nombre', $nombresNuevos)->get();
+        foreach ($huerfanos as $huerfano) {
+            if (! $huerfano->ventaItems()->exists() && ! $huerfano->pedidoItems()->exists()) {
+                $huerfano->stockJornadas()->delete();
+                $huerfano->delete();
+            } else {
+                $huerfano->update(['activo' => false, 'destacado' => false]);
+            }
+        }
 
         foreach ($productos as $p) {
             $porciones = $p['porciones'];

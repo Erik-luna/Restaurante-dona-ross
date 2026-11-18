@@ -110,12 +110,14 @@
                 @endforeach
 
                 <div class="mb-3 pt-2 border-top">
-                    <label class="form-label small fw-semibold" for="contacto_qr_pago">Código QR de Pago</label>
+                    <label class="form-label small fw-semibold" for="contacto_qr_pago">
+                        <i class="bi bi-qr-code text-danger me-1"></i> Código QR de Pago Oficial
+                    </label>
                     @if($qrPagoUrl)
-                        <div class="mb-2 p-2 bg-light border rounded-3 d-flex align-items-center gap-3">
+                        <div class="mb-2 p-3 bg-light border rounded-3 d-flex align-items-center gap-3">
                             <img src="{{ $qrPagoUrl }}" alt="QR de Pago actual" class="rounded border shadow-sm" style="width: 80px; height: 80px; object-fit: contain; background: #fff;">
                             <div>
-                                <div class="small fw-semibold text-dark">QR actual configurado</div>
+                                <div class="small fw-semibold text-dark">QR actual configurado y visible para los clientes</div>
                                 <div class="form-check mt-1">
                                     <input class="form-check-input" type="checkbox" name="eliminar_qr_pago" value="1" id="eliminar_qr_pago">
                                     <label class="form-check-label small text-danger" for="eliminar_qr_pago">
@@ -127,7 +129,14 @@
                     @endif
                     <input type="file" id="contacto_qr_pago" name="qr_pago" accept="image/jpeg,image/png,image/webp"
                            class="form-control form-control-sm @error('qr_pago') is-invalid @enderror">
-                    <div class="form-text text-muted">Formatos: JPG, PNG o WebP (máx. 2 MB). Se muestra en la portada y en el detalle de pedidos.</div>
+                    <div id="qrPreviewWrapper" class="mt-2 p-2 bg-light border rounded-3 d-none align-items-center gap-3">
+                        <img id="qrPreviewImg" src="" alt="Vista previa QR nuevo" class="rounded border shadow-sm" style="width: 80px; height: 80px; object-fit: contain; background: #fff;">
+                        <div>
+                            <span class="badge bg-success-subtle text-success small mb-1">Nueva imagen seleccionada</span>
+                            <div class="small text-muted">Haz clic en "Guardar contacto" abajo para aplicar este cambio.</div>
+                        </div>
+                    </div>
+                    <div class="form-text text-muted">Formatos: JPG, PNG o WebP (máx. 2 MB). Se muestra dinámicamente a los clientes al elegir pago por QR.</div>
                     @error('qr_pago')
                         <div class="form-text text-danger">{{ $message }}</div>
                     @enderror
@@ -171,3 +180,35 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function() {
+    function initQrPreviewAdmin() {
+        const input = document.getElementById('contacto_qr_pago');
+        const wrapper = document.getElementById('qrPreviewWrapper');
+        const img = document.getElementById('qrPreviewImg');
+        if (!input || !wrapper || !img) return;
+
+        input.addEventListener('change', function(e) {
+            const file = e.target.files && e.target.files[0];
+            if (file) {
+                img.src = URL.createObjectURL(file);
+                wrapper.classList.remove('d-none');
+                wrapper.classList.add('d-flex');
+            } else {
+                wrapper.classList.add('d-none');
+                wrapper.classList.remove('d-flex');
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initQrPreviewAdmin);
+    } else {
+        initQrPreviewAdmin();
+    }
+    window.addEventListener('spa:navigated', initQrPreviewAdmin);
+})();
+</script>
+@endpush

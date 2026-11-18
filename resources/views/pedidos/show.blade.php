@@ -131,20 +131,27 @@
                         Este pedido está cancelado, así que no hay nada que cobrar.
                     </p>
                 @else
-                    <p class="text-muted small">
+                    <p class="text-muted small mb-2">
                         Este pedido todavía no se cobró. El importe de
                         <strong>Bs. {{ number_format((float) $pedido->total, 2) }}</strong>
                         sigue pendiente.
                     </p>
+                    <div class="alert alert-light border rounded-3 p-2 mb-3 small d-flex align-items-center justify-content-between">
+                        <span class="text-muted">Método elegido por cliente:</span>
+                        <span class="badge rounded-pill px-2 py-1 {{ $pedido->metodo_pago === 'qr' ? 'bg-danger-subtle text-danger border border-danger' : 'bg-success-subtle text-success border border-success' }}">
+                            <i class="bi {{ $pedido->metodo_pago === 'qr' ? 'bi-qr-code' : 'bi-cash' }} me-1"></i>
+                            {{ $pedido->metodo_pago === 'qr' ? 'QR / Transferencia' : 'Efectivo' }}
+                        </span>
+                    </div>
                     <form action="{{ route(auth()->user()->panel().'.caja.cobrar', $pedido) }}"
                           method="POST">
                         @csrf
                         <div class="mb-2">
-                            <label class="form-label small text-muted" for="metodo_pago">Método de pago</label>
+                            <label class="form-label small text-muted" for="metodo_pago">Método de cobro</label>
                             <select name="metodo_pago" id="metodo_pago" class="form-select">
-                                <option value="efectivo" selected>Efectivo</option>
-                                <option value="qr">QR / Transferencia</option>
-                                <option value="tarjeta">Tarjeta</option>
+                                <option value="efectivo" {{ ($pedido->metodo_pago === 'efectivo' || ! $pedido->metodo_pago) ? 'selected' : '' }}>Efectivo</option>
+                                <option value="qr" {{ $pedido->metodo_pago === 'qr' ? 'selected' : '' }}>QR / Transferencia</option>
+                                <option value="tarjeta" {{ $pedido->metodo_pago === 'tarjeta' ? 'selected' : '' }}>Tarjeta</option>
                             </select>
                         </div>
                         <div class="mb-3">

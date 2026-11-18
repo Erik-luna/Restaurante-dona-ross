@@ -140,6 +140,56 @@
                         <input type="text" name="telefono_contacto" class="form-control" value="{{ auth()->user()->telefono }}" placeholder="Ej: 70000003" required>
                     </div>
 
+                    <h5 class="fw-bold mb-3 mt-4 font-serif" style="color: var(--ross-primary);">
+                        <i class="bi bi-credit-card-2-front-fill text-danger me-1"></i> Método de Pago *
+                    </h5>
+
+                    <div class="mb-3">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="card p-3 h-100 text-center rounded-3 cursor-pointer position-relative metodo-pago-card {{ old('metodo_pago', 'efectivo') === 'efectivo' ? 'border-primary shadow-sm bg-light' : 'border' }}" id="cardPagoEfectivo" style="cursor: pointer;">
+                                    <input class="form-check-input position-absolute top-0 end-0 m-2" type="radio" name="metodo_pago" id="metodoEfectivo" value="efectivo" {{ old('metodo_pago', 'efectivo') === 'efectivo' ? 'checked' : '' }}>
+                                    <i class="bi bi-cash-stack fs-2 text-success mb-1 d-block"></i>
+                                    <strong class="d-block text-dark small">Efectivo</strong>
+                                    <span class="text-muted" style="font-size: 0.72rem;">Contra entrega</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="card p-3 h-100 text-center rounded-3 cursor-pointer position-relative metodo-pago-card {{ old('metodo_pago') === 'qr' ? 'border-primary shadow-sm bg-light' : 'border' }}" id="cardPagoQr" style="cursor: pointer;">
+                                    <input class="form-check-input position-absolute top-0 end-0 m-2" type="radio" name="metodo_pago" id="metodoQr" value="qr" {{ old('metodo_pago') === 'qr' ? 'checked' : '' }}>
+                                    <i class="bi bi-qr-code fs-2 text-danger mb-1 d-block"></i>
+                                    <strong class="d-block text-dark small">Pago por QR</strong>
+                                    <span class="text-muted" style="font-size: 0.72rem;">Transferencia</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Información dinámica según el método de pago --}}
+                    <div id="infoPagoEfectivo" class="alert alert-light border rounded-3 p-3 mb-3 small {{ old('metodo_pago', 'efectivo') === 'efectivo' ? '' : 'd-none' }}">
+                        <i class="bi bi-info-circle-fill text-success me-1"></i>
+                        Pagas en <strong>efectivo (Bs. {{ number_format($total, 2) }})</strong> al repartidor al momento de recibir tus platillos.
+                    </div>
+
+                    <div id="infoPagoQr" class="card border rounded-3 p-3 mb-3 text-center bg-white shadow-sm {{ old('metodo_pago') === 'qr' ? '' : 'd-none' }}">
+                        <span class="badge badge-ross-gold text-dark px-3 py-1 fw-bold mx-auto mb-2" style="font-size: 0.75rem;">
+                            <i class="bi bi-qr-code me-1 text-danger"></i> QR Oficial Doña Ross
+                        </span>
+                        @if($qrPagoUrl)
+                            <div class="d-flex justify-content-center my-2">
+                                <img src="{{ $qrPagoUrl }}" alt="Código QR de Pago" class="img-thumbnail rounded-3 shadow-sm" style="width: 150px; height: 150px; object-fit: contain; background: #fff;">
+                            </div>
+                        @else
+                            <div class="p-3 my-2 bg-light rounded-3 border border-dashed text-muted small">
+                                <i class="bi bi-qr-code fs-1 d-block text-danger mb-1"></i>
+                                Código QR disponible en comprobante y pantalla de confirmación.
+                            </div>
+                        @endif
+                        <p class="text-muted small mb-0" style="font-size: 0.8rem;">
+                            Monto a transferir: <strong class="text-dark">Bs. {{ number_format($total, 2) }}</strong>. Podrás ver el comprobante una vez confirmado tu pedido.
+                        </p>
+                    </div>
+
                     <div class="mb-4">
                         <label class="form-label">Notas para la cocina o entrega</label>
                         <textarea name="notas" class="form-control" rows="2" placeholder="Ej: Sin cebolla, salsa extra, timbre al llegar...">{{ old('notas') }}</textarea>
@@ -174,3 +224,49 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function() {
+    function initMetodoPagoCarrito() {
+        const radios = document.querySelectorAll('input[name="metodo_pago"]');
+        const infoEfectivo = document.getElementById('infoPagoEfectivo');
+        const infoQr = document.getElementById('infoPagoQr');
+        const cardEfectivo = document.getElementById('cardPagoEfectivo');
+        const cardQr = document.getElementById('cardPagoQr');
+
+        if (!radios.length) return;
+
+        function actualizarSeleccion(val) {
+            const esQr = val === 'qr';
+            if (infoEfectivo) infoEfectivo.classList.toggle('d-none', esQr);
+            if (infoQr) infoQr.classList.toggle('d-none', !esQr);
+
+            if (cardEfectivo) {
+                cardEfectivo.classList.toggle('border-primary', !esQr);
+                cardEfectivo.classList.toggle('shadow-sm', !esQr);
+                cardEfectivo.classList.toggle('bg-light', !esQr);
+            }
+            if (cardQr) {
+                cardQr.classList.toggle('border-primary', esQr);
+                cardQr.classList.toggle('shadow-sm', esQr);
+                cardQr.classList.toggle('bg-light', esQr);
+            }
+        }
+
+        radios.forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                actualizarSeleccion(this.value);
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initMetodoPagoCarrito);
+    } else {
+        initMetodoPagoCarrito();
+    }
+    window.addEventListener('spa:navigated', initMetodoPagoCarrito);
+})();
+</script>
+@endpush

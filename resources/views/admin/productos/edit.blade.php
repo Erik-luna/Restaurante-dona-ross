@@ -53,8 +53,6 @@
                     {{ $d }} disponible{{ $d === 1 ? '' : 's' }}
                 </div>
                 <small class="text-muted">
-                    El stock pertenece a la jornada, no al producto, y no se cambia desde aquí:
-                    corregirlo aquí dejaría la carga menor que lo ya vendido.
                     <a href="{{ route(auth()->user()->panel().'.stock.index') }}">Ir a Control de Stock</a>.
                 </small>
             </div>

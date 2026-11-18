@@ -17,7 +17,15 @@ class CheckoutRequest extends BaseRequest
             'direccion_entrega' => ['required', ...Reglas::DIRECCION],
             'telefono_contacto' => ['required', ...Reglas::TELEFONO],
             'notas' => ['nullable', 'string', 'max:500'],
+            'metodo_pago' => ['nullable', 'string', 'in:efectivo,qr'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (! $this->has('metodo_pago') || empty($this->input('metodo_pago'))) {
+            $this->merge(['metodo_pago' => 'efectivo']);
+        }
     }
 
     protected function mensajesPropios(): array

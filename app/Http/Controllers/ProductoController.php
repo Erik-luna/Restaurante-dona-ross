@@ -19,7 +19,7 @@ class ProductoController extends Controller
         $productos = Producto::with('categoria')
             ->select('productos.*')
             ->selectRaw(Producto::EXPRESION_DISPONIBLE.' as disponible', Producto::rangoDeFecha())
-            ->latest()
+            ->orderBy('id', 'asc')
             ->paginate(10);
 
         return view('admin.productos.index', compact('productos'));

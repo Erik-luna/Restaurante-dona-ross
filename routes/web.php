@@ -111,3 +111,6 @@ Route::middleware(['auth', 'role:administrador'])->prefix('admin')->name('admin.
     Route::post('/caja/{caja}/cierre', [CajaController::class, 'storeCierre'])->name('caja.cierre.store');
 });
 Route::redirect('/admin', '/admin/dashboard');
+Route::redirect('/cajero', '/cajero/dashboard');
+Route::redirect('/cocina', '/cocina/dashboard');
+Route::redirect('/cliente', '/cliente/dashboard');
