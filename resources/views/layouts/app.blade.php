@@ -519,7 +519,7 @@
         </div>
     </nav>
 
-    <main class="flex-grow-1 py-4" id="spa-container">
+    <main class="flex-grow-1 py-4">
         <div class="container">
             @include('partials.alerts')
         </div>
@@ -614,7 +614,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/spa-nav.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

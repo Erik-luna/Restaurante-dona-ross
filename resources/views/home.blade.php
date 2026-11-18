@@ -594,10 +594,6 @@
     } else {
         initCarouselDestacados();
     }
-
-    window.addEventListener('spa:navigated', function () {
-        initCarouselDestacados();
-    });
 })();
 </script>
 @endpush

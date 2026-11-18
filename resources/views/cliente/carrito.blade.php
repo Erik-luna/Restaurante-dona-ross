@@ -266,7 +266,6 @@
     } else {
         initMetodoPagoCarrito();
     }
-    window.addEventListener('spa:navigated', initMetodoPagoCarrito);
 })();
 </script>
 @endpush

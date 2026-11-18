@@ -327,12 +327,12 @@
                     <h5 class="offcanvas-title text-white fw-bold" id="adminSidebarLabel">@yield('panel-title', 'Panel')</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar menú"></button>
                 </div>
-                <div class="offcanvas-body" id="spa-sidebar">
+                <div class="offcanvas-body">
                     @yield('sidebar')
                 </div>
             </div>
 
-            <main class="col-12 col-lg-10 admin-content p-3 p-md-4 p-xl-5" id="spa-container">
+            <main class="col-12 col-lg-10 admin-content p-3 p-md-4 p-xl-5">
                 @include('partials.alerts')
                 @yield('content')
             </main>
@@ -340,7 +340,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/spa-nav.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

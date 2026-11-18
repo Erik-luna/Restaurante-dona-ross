@@ -27,8 +27,8 @@
                     <i class="bi bi-arrow-left me-1"></i> Volver al Detalle
                 </a>
             @else
-                <a href="{{ route('pedidos.show', $pedido) }}" class="btn btn-ross-primary btn-sm rounded-pill px-3">
-                    <i class="bi bi-arrow-left me-1"></i> Volver a Pedidos
+                <a href="{{ route(auth()->user()->panel().'.pedidos.show', $pedido) }}" class="btn btn-ross-primary btn-sm rounded-pill px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Volver al Detalle
                 </a>
             @endif
         </div>

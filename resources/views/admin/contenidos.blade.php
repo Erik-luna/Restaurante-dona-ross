@@ -208,7 +208,6 @@
     } else {
         initQrPreviewAdmin();
     }
-    window.addEventListener('spa:navigated', initQrPreviewAdmin);
 })();
 </script>
 @endpush
