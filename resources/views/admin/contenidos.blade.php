@@ -30,6 +30,7 @@
 
             <form action="{{ route('admin.contenidos.horarios') }}" method="POST">
                 @csrf
+                @method('PUT')
 
                 <div class="table-responsive">
                     <table class="table align-middle">
@@ -127,7 +128,7 @@
                             </div>
                         </div>
                     @endif
-                    <input type="file" id="contacto_qr_pago" name="qr_pago" accept="image/jpeg,image/png,image/webp"
+                    <input type="file" id="contacto_qr_pago" name="qr_pago" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                            class="form-control form-control-sm @error('qr_pago') is-invalid @enderror">
                     <div id="qrPreviewWrapper" class="mt-2 p-2 bg-light border rounded-3 d-none align-items-center gap-3">
                         <img id="qrPreviewImg" src="" alt="Vista previa QR nuevo" class="rounded border shadow-sm" style="width: 80px; height: 80px; object-fit: contain; background: #fff;">
@@ -136,7 +137,7 @@
                             <div class="small text-muted">Haz clic en "Guardar contacto" abajo para aplicar este cambio.</div>
                         </div>
                     </div>
-                    <div class="form-text text-muted">Formatos: JPG, PNG o WebP (máx. 2 MB). Se muestra dinámicamente a los clientes al elegir pago por QR.</div>
+                    <div class="form-text text-muted">Formatos permitidos: JPG, JPEG, PNG o WEBP (máx. 10 MB). Se muestra dinámicamente a los clientes al elegir pago por QR.</div>
                     @error('qr_pago')
                         <div class="form-text text-danger">{{ $message }}</div>
                     @enderror

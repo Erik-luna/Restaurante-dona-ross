@@ -302,7 +302,7 @@
                     </span>
                 </div>
 
-                <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-2 px-sm-3" target="_blank" title="Abrir sitio web público">
+                <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-2 px-sm-3" title="Ver sitio web público">
                     <i class="bi bi-box-arrow-up-right me-1"></i> <span class="d-none d-md-inline">Ver Sitio</span>
                 </a>
 

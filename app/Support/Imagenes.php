@@ -76,6 +76,10 @@ class Imagenes
         }
 
         // Rutas del disco configurado: platos/..., productos/..., promociones/...
+        if (static::disco() === 'public') {
+            return asset('storage/'.$ruta);
+        }
+
         return static::almacenamiento()->url($ruta);
     }
 
